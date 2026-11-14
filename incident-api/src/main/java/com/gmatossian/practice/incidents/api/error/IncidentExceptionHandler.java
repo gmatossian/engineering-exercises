@@ -1,5 +1,6 @@
 package com.gmatossian.practice.incidents.api.error;
 
+import com.gmatossian.practice.incidents.service.exception.IncidentNotFoundException;
 import com.gmatossian.practice.incidents.service.exception.InvalidIncidentSearchException;
 import com.gmatossian.practice.incidents.service.exception.SiteAccessDeniedException;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,10 @@ public class IncidentExceptionHandler {
 
 
 
+    @ExceptionHandler(IncidentNotFoundException.class)
+    public ProblemDetail notFound(IncidentNotFoundException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
 
     @ExceptionHandler(InvalidIncidentSearchException.class)
     public ProblemDetail invalidSearch(InvalidIncidentSearchException exception) {

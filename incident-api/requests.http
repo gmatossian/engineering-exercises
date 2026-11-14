@@ -20,3 +20,15 @@ GET {{baseUrl}}/incidents?siteId=site-c
 
 ### Invalid limit
 GET {{baseUrl}}/incidents?limit=101
+
+### Details with ordered activity history
+GET {{baseUrl}}/incidents/28
+
+### Details with empty history
+GET {{baseUrl}}/incidents/4
+
+### Forbidden incident
+GET {{baseUrl}}/incidents/3
+
+### Missing incident
+GET {{baseUrl}}/incidents/9999

@@ -1,17 +1,21 @@
 package com.gmatossian.practice.incidents.repository;
 
+import com.gmatossian.practice.incidents.domain.Incident;
+import com.gmatossian.practice.incidents.domain.IncidentActivity;
 import com.gmatossian.practice.incidents.domain.IncidentSeverity;
 import com.gmatossian.practice.incidents.domain.IncidentStatus;
 import com.gmatossian.practice.incidents.repository.projection.IncidentSummary;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -79,9 +83,44 @@ public class JdbcIncidentRepository implements IncidentRepository {
                 .list();
     }
 
+    @Override
+    public Optional<Incident> findById(long id) {
+        return jdbc.sql("""
+                        SELECT id, site_id, type, severity, status, occurred_at, description
+                        FROM incidents
+                        WHERE id = :id
+                        """)
+                .param("id", id)
+                .query((rs, rowNum) -> new IncidentRow(
+                        rs.getLong("id"),
+                        rs.getString("site_id"),
+                        rs.getString("type"),
+                        IncidentSeverity.valueOf(rs.getString("severity")),
+                        IncidentStatus.valueOf(rs.getString("status")),
+                        rs.getObject("occurred_at", OffsetDateTime.class).toInstant(),
+                        rs.getString("description")))
+                .optional()
+                .map(row -> new Incident(row.id(), row.siteId(), row.type(), row.severity(),
+                        row.status(), row.occurredAt(), row.description(), loadActivityHistory(id)));
+    }
 
 
 
+    private List<IncidentActivity> loadActivityHistory(long incidentId) {
+        return jdbc.sql("""
+                        SELECT action, actor_id, occurred_at
+                        FROM incident_activities
+                        WHERE incident_id = :incidentId
+                        ORDER BY occurred_at ASC, id ASC
+                        """)
+                .param("incidentId", incidentId)
+                .query((rs, rowNum) -> new IncidentActivity(rs.getString("action"), rs.getString("actor_id"),
+                        rs.getObject("occurred_at", OffsetDateTime.class).toInstant()))
+                .list();
+    }
 
-
+    private record IncidentRow(long id, String siteId, String type,
+                               IncidentSeverity severity, IncidentStatus status,
+                               Instant occurredAt, String description) {
+    }
 }

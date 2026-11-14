@@ -1,6 +1,10 @@
 package com.gmatossian.practice.incidents.service;
 
+import com.gmatossian.practice.incidents.api.dto.IncidentActivityResponse;
+import com.gmatossian.practice.incidents.api.dto.IncidentDetailResponse;
 import com.gmatossian.practice.incidents.api.dto.IncidentSummaryResponse;
+import com.gmatossian.practice.incidents.domain.Incident;
+import com.gmatossian.practice.incidents.domain.IncidentActivity;
 import com.gmatossian.practice.incidents.domain.IncidentSeverity;
 import com.gmatossian.practice.incidents.domain.IncidentStatus;
 import com.gmatossian.practice.incidents.repository.Cursor;
@@ -8,6 +12,7 @@ import com.gmatossian.practice.incidents.repository.IncidentRepository;
 import com.gmatossian.practice.incidents.repository.IncidentSearch;
 import com.gmatossian.practice.incidents.repository.projection.IncidentSummary;
 import com.gmatossian.practice.incidents.service.cursor.IncidentCursorCodec;
+import com.gmatossian.practice.incidents.service.exception.IncidentNotFoundException;
 import com.gmatossian.practice.incidents.service.exception.InvalidIncidentSearchException;
 import com.gmatossian.practice.incidents.service.exception.SiteAccessDeniedException;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +21,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -158,9 +164,43 @@ class IncidentServiceTests {
                 () -> service.search(ALL_SITES, null, null, 20, null)));
     }
 
+    @Test
+    void mapsDetailsAndNestedActivityResponses() {
+        var incident = new Incident(28, "site-a", "ALARM_TRIGGERED", IncidentSeverity.HIGH,
+                IncidentStatus.ACKNOWLEDGED, TIME, "Incident description", List.of(
+                new IncidentActivity("CREATED", "operator-a", TIME),
+                new IncidentActivity("ACKNOWLEDGED", "operator-b", TIME.plusSeconds(10))));
+        when(repository.findById(28)).thenReturn(Optional.of(incident));
 
+        var response = service.getDetails(ALL_SITES, 28);
 
+        assertEquals(new IncidentDetailResponse(28, "site-a", "ALARM_TRIGGERED", IncidentSeverity.HIGH,
+                IncidentStatus.ACKNOWLEDGED, TIME, "Incident description", List.of(
+                new IncidentActivityResponse("CREATED", "operator-a", TIME),
+                new IncidentActivityResponse("ACKNOWLEDGED", "operator-b", TIME.plusSeconds(10)))), response);
+        verify(repository).findById(28);
+    }
 
+    @Test
+    void emptyDetailAccessScopeThrowsAccessDeniedWithoutQuerying() {
+        assertThrows(SiteAccessDeniedException.class, () -> service.getDetails(Set.of(), 28));
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    void missingDetailsThrowNotFound() {
+        when(repository.findById(9999)).thenReturn(Optional.empty());
+
+        assertThrows(IncidentNotFoundException.class, () -> service.getDetails(ALL_SITES, 9999));
+    }
+
+    @Test
+    void existingDetailsOutsideScopeThrowAccessDenied() {
+        when(repository.findById(3)).thenReturn(Optional.of(new Incident(3, "site-c", "ALARM_TRIGGERED",
+                IncidentSeverity.HIGH, IncidentStatus.OPEN, TIME, "Forbidden incident", List.of())));
+
+        assertThrows(SiteAccessDeniedException.class, () -> service.getDetails(ALL_SITES, 3));
+    }
 
     private static List<IncidentSummary> summaries(int count) {
         return IntStream.range(0, count)

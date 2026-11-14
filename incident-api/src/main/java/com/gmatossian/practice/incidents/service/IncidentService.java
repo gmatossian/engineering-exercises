@@ -1,13 +1,17 @@
 package com.gmatossian.practice.incidents.service;
 
+import com.gmatossian.practice.incidents.api.dto.IncidentActivityResponse;
+import com.gmatossian.practice.incidents.api.dto.IncidentDetailResponse;
 import com.gmatossian.practice.incidents.api.dto.IncidentSearchResponse;
 import com.gmatossian.practice.incidents.api.dto.IncidentSummaryResponse;
+import com.gmatossian.practice.incidents.domain.Incident;
 import com.gmatossian.practice.incidents.domain.IncidentSeverity;
 import com.gmatossian.practice.incidents.repository.Cursor;
 import com.gmatossian.practice.incidents.repository.IncidentRepository;
 import com.gmatossian.practice.incidents.repository.IncidentSearch;
 import com.gmatossian.practice.incidents.repository.projection.IncidentSummary;
 import com.gmatossian.practice.incidents.service.cursor.IncidentCursorCodec;
+import com.gmatossian.practice.incidents.service.exception.IncidentNotFoundException;
 import com.gmatossian.practice.incidents.service.exception.InvalidIncidentSearchException;
 import com.gmatossian.practice.incidents.service.exception.SiteAccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -65,7 +69,33 @@ public class IncidentService {
         return new IncidentSearchResponse(responses, nextCursor);
     }
 
+    @Transactional(readOnly = true)
+    public IncidentDetailResponse getDetails(Set<String> authorizedSiteIds, long id) {
+        return toDetailResponse(findAccessibleIncident(authorizedSiteIds, id));
+    }
 
 
+    private Incident findAccessibleIncident(Set<String> authorizedSiteIds, long id) {
+        if (authorizedSiteIds.isEmpty()) {
+            throw new SiteAccessDeniedException();
+        }
 
+        Incident incident = repository.findById(id)
+                .orElseThrow(() -> new IncidentNotFoundException(id));
+        if (!authorizedSiteIds.contains(incident.siteId())) {
+            throw new SiteAccessDeniedException();
+        }
+
+        return incident;
+    }
+
+    private IncidentDetailResponse toDetailResponse(Incident incident) {
+        List<IncidentActivityResponse> activities = incident.activityHistory().stream()
+                .map(activity -> new IncidentActivityResponse(activity.action(), activity.actorId(),
+                        activity.occurredAt()))
+                .toList();
+        return new IncidentDetailResponse(incident.id(), incident.siteId(), incident.type(),
+                incident.severity(), incident.status(), incident.occurredAt(),
+                incident.description(), activities);
+    }
 }

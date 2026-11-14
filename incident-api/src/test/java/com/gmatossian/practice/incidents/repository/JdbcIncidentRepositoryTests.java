@@ -1,5 +1,6 @@
 package com.gmatossian.practice.incidents.repository;
 
+import com.gmatossian.practice.incidents.domain.IncidentActivity;
 import com.gmatossian.practice.incidents.domain.IncidentSeverity;
 import com.gmatossian.practice.incidents.domain.IncidentStatus;
 import com.gmatossian.practice.incidents.repository.projection.IncidentSummary;
@@ -197,9 +198,58 @@ class JdbcIncidentRepositoryTests {
                 () -> repository.search(ALL_SITES, new IncidentSearch(null, null, null, -1)));
     }
 
+    @Test
+    void findsNonOpenIncidentDetailsWithCompleteHistory() {
+        var acknowledged = repository.findById(28).orElseThrow();
+        assertEquals(28L, acknowledged.id());
+        assertEquals("site-a", acknowledged.siteId());
+        assertEquals("DOOR_FORCED_OPEN", acknowledged.type());
+        assertEquals(IncidentSeverity.LOW, acknowledged.severity());
+        assertEquals(IncidentStatus.ACKNOWLEDGED, acknowledged.status());
+        assertEquals(Instant.parse("2026-11-12T18:26:00Z"), acknowledged.occurredAt());
+        assertEquals("Practice incident 28: DOOR_FORCED_OPEN at site-a.", acknowledged.description());
+        assertEquals(List.of(
+                new IncidentActivity("CREATED", "operator-a", Instant.parse("2026-11-12T18:26:00Z")),
+                new IncidentActivity("ACKNOWLEDGED", "operator-a", Instant.parse("2026-11-12T18:26:10Z"))),
+                acknowledged.activityHistory());
 
+        var resolved = repository.findById(64).orElseThrow();
+        assertEquals(IncidentStatus.RESOLVED, resolved.status());
+        assertEquals(List.of("CREATED", "ACKNOWLEDGED", "RESOLVED"),
+                resolved.activityHistory().stream().map(IncidentActivity::action).toList());
+    }
 
+    @Test
+    void missingIncidentProducesAnEmptyOptional() {
+        assertTrue(repository.findById(9999).isEmpty());
+    }
 
+    @Test
+    void incidentWithoutActivitiesStillHasDetails() {
+        var incident = repository.findById(4).orElseThrow();
+
+        assertEquals(4L, incident.id());
+        assertEquals("Practice incident 4: DOOR_FORCED_OPEN at site-a.", incident.description());
+        assertTrue(incident.activityHistory().isEmpty());
+    }
+
+    @Test
+    void detailHistoryBreaksTimestampTiesByActivityId() {
+        for (int id : new int[]{2001, 2000}) {
+            jdbc.sql("""
+                            INSERT INTO incident_activities (id, incident_id, action, actor_id, occurred_at)
+                            VALUES (:id, 1, :action, 'operator-a',
+                                    TIMESTAMP WITH TIME ZONE '2026-11-12 18:30:00+00:00')
+                            """)
+                    .param("id", id)
+                    .param("action", "ACTION_" + id)
+                    .update();
+        }
+
+        assertEquals(List.of("CREATED", "ACTION_2000", "ACTION_2001"),
+                repository.findById(1).orElseThrow().activityHistory().stream()
+                        .map(IncidentActivity::action).toList());
+    }
 
     private void insertIncident(long id, OffsetDateTime time) {
         jdbc.sql("""

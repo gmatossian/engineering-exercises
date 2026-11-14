@@ -137,8 +137,51 @@ class IncidentControllerTests {
                 .andExpect(jsonPath("$.nextCursor").value(nullValue()));
     }
 
+    @Test
+    void returnsDetailsAndOrderedHistoryWithoutAPageWrapper() throws Exception {
+        mvc.perform(get("/incidents/28"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(28))
+                .andExpect(jsonPath("$.siteId").value("site-a"))
+                .andExpect(jsonPath("$.status").value("ACKNOWLEDGED"))
+                .andExpect(jsonPath("$.description").value("Practice incident 28: DOOR_FORCED_OPEN at site-a."))
+                .andExpect(jsonPath("$.activityHistory.length()").value(2))
+                .andExpect(jsonPath("$.activityHistory[*].action", contains("CREATED", "ACKNOWLEDGED")))
+                .andExpect(jsonPath("$.activityHistory[0].actorId").value("operator-a"))
+                .andExpect(jsonPath("$.activityHistory[0].occurredAt").value("2026-11-12T18:26:00Z"))
+                .andExpect(jsonPath("$.incidents").doesNotExist())
+                .andExpect(jsonPath("$.nextCursor").doesNotExist());
+    }
 
+    @Test
+    void returnsDetailsWithEmptyActivityHistory() throws Exception {
+        mvc.perform(get("/incidents/4"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(4))
+                .andExpect(jsonPath("$.description").isString())
+                .andExpect(jsonPath("$.activityHistory").isEmpty());
+    }
 
+    @Test
+    void returnsNotFoundForMissingIncident() throws Exception {
+        mvc.perform(get("/incidents/9999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.detail").value("Incident 9999 not found"));
+    }
 
+    @Test
+    void returnsForbiddenForExistingIncidentOnAnotherSite() throws Exception {
+        mvc.perform(get("/incidents/3"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(403));
+    }
 
+    @Test
+    void returnsBadRequestForNonNumericPathId() throws Exception {
+        mvc.perform(get("/incidents/not-a-number"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.detail").value("Invalid value for parameter 'id'"));
+    }
 }

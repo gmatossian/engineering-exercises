@@ -1,8 +1,10 @@
 package com.gmatossian.practice.incidents.repository;
 
+import com.gmatossian.practice.incidents.domain.Incident;
 import com.gmatossian.practice.incidents.repository.projection.IncidentSummary;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface IncidentRepository {
@@ -18,6 +20,8 @@ public interface IncidentRepository {
      */
     List<IncidentSummary> search(Set<String> authorizedSiteIds, IncidentSearch search);
 
+    /** Loads any-status details and ordered history; the service must check site access. */
+    Optional<Incident> findById(long id);
 
 
 }
