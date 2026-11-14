@@ -13,13 +13,34 @@ Each checkpoint is intended to compile and pass its applicable tests. The
 complete sequence introduces the scaffold, model, database, list endpoint,
 detail endpoint and status update in that order.
 
+## Project layout
+
+```text
+incident-api/
+  README.md
+  backend/
+    pom.xml
+    mvnw
+    src/
+    requests.http
+  frontend/
+    .gitkeep
+```
+
+The Spring Boot application lives in `backend/`. `frontend/` is reserved for a
+future UI and contains only an empty `.gitkeep`, because Git does not track empty
+directories. No UI, frontend framework, dependencies or build setup is present.
+The six historical checkpoints below predate this directory split; their
+snapshot links retain the original layout.
+
 ## Run
 
 Prerequisite: a JDK 21 installation selected in `JAVA_HOME` (verified with
 Temurin 21). Maven is supplied by the wrapper (3.10.0); Spring Boot is 4.1.2.
-From this directory:
+From this project directory:
 
 ```sh
+cd backend
 ./mvnw test
 ./mvnw spring-boot:run
 ```
@@ -27,11 +48,11 @@ From this directory:
 On Windows, use `mvnw.cmd`. The first run needs network access to download
 Maven/dependencies. Subsequent runs can use `./mvnw --offline test` if cached.
 The application binds to `127.0.0.1:8081`; `/actuator/health` verifies startup.
-Use the requests available at this checkpoint in [requests.http](requests.http).
+Use the requests available at this checkpoint in [requests.http](backend/requests.http).
 
 ## Available at this checkpoint
 
-- Java 21 / Spring Boot application, Web MVC, Validation and Actuator; one context-load test. No incident endpoint or database yet.
+- Java 21 / Spring Boot application, Web MVC, Validation and Actuator, with fixture, repository, service, codec and MVC tests.
 - Incident and activity records, severity/status enums, absolute timestamps (`Instant`). The domain model has no ORM dependency.
 - Embedded in-memory H2 with Spring JDBC, explicit schema and deterministic fixtures: 96 incidents, three sites, all severity/status values, tied timestamps and selected activity histories. Each restart restores the seed data.
 - `GET /incidents`: OPEN incidents, optional site/severity filters, default limit 20 (1–100), descending occurrence-time/ID ordering and opaque cursor continuation. The response contains incident summaries and `nextCursor`; the final page has a null cursor. The repository fetches one extra record to detect continuation. Fixed demo access allows site-a/site-b; site-c is forbidden. Validation errors are 400 and forbidden sites 403.
@@ -44,7 +65,7 @@ Final checkpoint verified with **64 passing tests**, zero failures/errors/skips.
 
 - This is a local learning exercise with fictional fixture data, not production software.
 - Fixed demo access is not authentication. There is no user-management/security setup.
-- The list is deliberately OPEN-only; acknowledged/resolved incidents are available by ID once the detail endpoint exists.
+- The list is deliberately OPEN-only; acknowledged/resolved incidents are available by ID.
 - Cursors are URL-safe Base64 of `id|timestamp`, not encryption. There is no signature, filter fingerprint, expiry or snapshot. Reset the cursor when filters change. Loading more retrieves older results; refresh starts again for newer results.
 - Filtering/pagination use current data. Updates can change which incidents match while browsing.
 - No total/remaining counts, numbered pages, live push feed or UI are implemented.
