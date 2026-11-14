@@ -7,7 +7,7 @@ independent/timed assessment. Commits retain their actual creation dates.
 
 ## Current checkpoint
 
-**1. Create Spring Boot scaffold**
+**2. Add incident domain model**
 
 Each checkpoint is intended to compile and pass its applicable tests. The
 complete sequence introduces the scaffold, model, database, list endpoint,
@@ -32,5 +32,6 @@ Use the requests available at this checkpoint in [requests.http](requests.http).
 ## Available at this checkpoint
 
 - Java 21 / Spring Boot application, Web MVC, Validation and Actuator; one context-load test. No incident endpoint or database yet.
+- Incident and activity records, severity/status enums, absolute timestamps (`Instant`). The domain model has no ORM dependency.
 
 Checkpoint verification target: **1 passing tests**. Verification covers the current features, with further tests introduced alongside later endpoints.
