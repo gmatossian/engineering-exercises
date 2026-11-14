@@ -2,3 +2,21 @@
 
 ### Application health
 GET {{baseUrl}}/actuator/health
+
+### First page: the fixed demo scope includes site-a and site-b
+GET {{baseUrl}}/incidents?limit=20
+Accept: application/json
+
+### Filtered first page (eight matching fixtures, so limit 3 exercises pagination)
+GET {{baseUrl}}/incidents?siteId=site-a&severity=HIGH&limit=3
+Accept: application/json
+
+### Continuation: copy nextCursor from the filtered response and keep its filters
+GET {{baseUrl}}/incidents?siteId=site-a&severity=HIGH&limit=3&cursor=PASTE_NEXT_CURSOR_HERE
+Accept: application/json
+
+### Forbidden site
+GET {{baseUrl}}/incidents?siteId=site-c
+
+### Invalid limit
+GET {{baseUrl}}/incidents?limit=101
