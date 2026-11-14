@@ -4,9 +4,12 @@ import com.gmatossian.practice.incidents.api.dto.IncidentSummaryResponse;
 import com.gmatossian.practice.incidents.domain.IncidentSeverity;
 import com.gmatossian.practice.incidents.domain.IncidentStatus;
 import com.gmatossian.practice.incidents.repository.IncidentRepository;
+import com.gmatossian.practice.incidents.service.exception.SiteAccessDeniedException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,8 +29,31 @@ class IncidentServiceIntegrationTests {
     @Autowired
     private IncidentRepository repository;
 
+    @Test
+    void rollsBackStatusWhenTheHistoryInsertFails() {
+        // Null actor violates the history table's NOT NULL constraint after the UPDATE.
+        assertThrows(DataIntegrityViolationException.class,
+                () -> service.updateStatus(Set.of("site-a"), 1, IncidentStatus.ACKNOWLEDGED, null));
 
+        var unchanged = service.getDetails(Set.of("site-a"), 1);
+        assertEquals(IncidentStatus.OPEN, unchanged.status());
+        assertEquals(1, unchanged.activityHistory().size());
+    }
 
+    @Test
+    @Transactional
+    void conditionalUpdateDoesNotOverwriteAStatusChangedSinceTheRead() {
+        assertTrue(repository.updateStatus(1, IncidentStatus.OPEN, IncidentStatus.ACKNOWLEDGED));
+        assertFalse(repository.updateStatus(1, IncidentStatus.OPEN, IncidentStatus.RESOLVED));
+        assertEquals(IncidentStatus.ACKNOWLEDGED, repository.findById(1).orElseThrow().status());
+    }
+
+    @Test
+    void anEmptyAccessScopeCannotChangeAnIncident() {
+        assertThrows(SiteAccessDeniedException.class,
+                () -> service.updateStatus(Set.of(), 1, IncidentStatus.ACKNOWLEDGED, "demo-user"));
+        assertEquals(IncidentStatus.OPEN, repository.findById(1).orElseThrow().status());
+    }
 
     @Test
     void traversesAllOpenFixturesThroughEncodedContinuationTokens() {

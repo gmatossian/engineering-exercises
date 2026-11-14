@@ -8,6 +8,9 @@ import java.util.Set;
 @Component
 public class DemoSiteAccessProvider {
 
+    public String actorId() {
+        return "demo-user";
+    }
 
     public Set<String> authorizedSiteIds() {
         // Fixed demo user: site-c is deliberately unavailable. No authentication yet.

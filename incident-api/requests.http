@@ -32,3 +32,21 @@ GET {{baseUrl}}/incidents/3
 
 ### Missing incident
 GET {{baseUrl}}/incidents/9999
+
+### Acknowledge; repeating the request does not duplicate history
+PATCH {{baseUrl}}/incidents/1
+Content-Type: application/json
+
+{"status":"ACKNOWLEDGED"}
+
+### Resolve
+PATCH {{baseUrl}}/incidents/1
+Content-Type: application/json
+
+{"status":"RESOLVED"}
+
+### Conflict: resolved incidents cannot be reopened
+PATCH {{baseUrl}}/incidents/64
+Content-Type: application/json
+
+{"status":"OPEN"}

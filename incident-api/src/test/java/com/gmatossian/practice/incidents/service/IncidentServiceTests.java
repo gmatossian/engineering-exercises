@@ -14,6 +14,7 @@ import com.gmatossian.practice.incidents.repository.projection.IncidentSummary;
 import com.gmatossian.practice.incidents.service.cursor.IncidentCursorCodec;
 import com.gmatossian.practice.incidents.service.exception.IncidentNotFoundException;
 import com.gmatossian.practice.incidents.service.exception.InvalidIncidentSearchException;
+import com.gmatossian.practice.incidents.service.exception.InvalidIncidentTransitionException;
 import com.gmatossian.practice.incidents.service.exception.SiteAccessDeniedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,17 @@ class IncidentServiceTests {
         service = new IncidentService(repository, codec);
     }
 
+    @Test
+    void aConflictingWriteDoesNotAddHistory() {
+        when(repository.findById(1)).thenReturn(Optional.of(new Incident(1, "site-a", "ALARM_TRIGGERED",
+                IncidentSeverity.HIGH, IncidentStatus.OPEN, TIME, "Alarm", List.of())));
+        when(repository.updateStatus(1, IncidentStatus.OPEN, IncidentStatus.ACKNOWLEDGED)).thenReturn(false);
+
+        assertThrows(InvalidIncidentTransitionException.class,
+                () -> service.updateStatus(ALL_SITES, 1, IncidentStatus.ACKNOWLEDGED, "demo-user"));
+
+        verify(repository, never()).addActivity(anyLong(), any());
+    }
 
     @Test
     void defaultsToTwentyAndBuildsCursorFromTwentiethRatherThanLookAheadRecord() {

@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.Set;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(properties = "spring.datasource.url=jdbc:h2:mem:incident_http;DB_CLOSE_ON_EXIT=FALSE")
@@ -31,10 +33,75 @@ class IncidentControllerTests {
     @Autowired
     private IncidentCursorCodec cursorCodec;
 
+    @Test
+    @Transactional
+    void acknowledgesAndResolvesAnIncidentWithoutDuplicatingHistoryOnRepeat() throws Exception {
+        mvc.perform(patch("/incidents/1").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"ACKNOWLEDGED\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("ACKNOWLEDGED"))
+                .andExpect(jsonPath("$.activityHistory.length()").value(2))
+                .andExpect(jsonPath("$.activityHistory[1].action").value("ACKNOWLEDGED"))
+                .andExpect(jsonPath("$.activityHistory[1].actorId").value("demo-user"));
 
+        mvc.perform(patch("/incidents/1").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"ACKNOWLEDGED\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.activityHistory.length()").value(2));
 
+        mvc.perform(patch("/incidents/1").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"RESOLVED\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("RESOLVED"))
+                .andExpect(jsonPath("$.activityHistory.length()").value(3));
 
+        mvc.perform(get("/incidents/1"))
+                .andExpect(jsonPath("$.status").value("RESOLVED"));
+        mvc.perform(get("/incidents").param("limit", "100"))
+                .andExpect(jsonPath("$.incidents[*].id", not(hasItem(1))));
+    }
 
+    @Test
+    @Transactional
+    void canResolveAnOpenIncidentDirectly() throws Exception {
+        mvc.perform(patch("/incidents/4").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"RESOLVED\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("RESOLVED"))
+                .andExpect(jsonPath("$.activityHistory.length()").value(1));
+    }
+
+    @Test
+    void rejectsBackwardTransitionsWithConflict() throws Exception {
+        mvc.perform(patch("/incidents/64").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"ACKNOWLEDGED\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value("Cannot change status from RESOLVED to ACKNOWLEDGED"));
+        mvc.perform(patch("/incidents/28").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"OPEN\"}"))
+                .andExpect(status().isConflict());
+        mvc.perform(get("/incidents/64"))
+                .andExpect(jsonPath("$.status").value("RESOLVED"))
+                .andExpect(jsonPath("$.activityHistory.length()").value(3));
+    }
+
+    @Test
+    void rejectsMissingUnknownOrMalformedStatusInput() throws Exception {
+        for (String body : List.of("{}", "{\"status\":null}", "{\"status\":\"BANANA\"}", "{")) {
+            mvc.perform(patch("/incidents/1").contentType(MediaType.APPLICATION_JSON).content(body))
+                    .andExpect(status().isBadRequest());
+        }
+    }
+
+    @Test
+    void statusUpdateUsesTheSameForbiddenAndMissingRulesAsDetails() throws Exception {
+        mvc.perform(patch("/incidents/3").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"ACKNOWLEDGED\"}"))
+                .andExpect(status().isForbidden());
+        mvc.perform(patch("/incidents/9999").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"ACKNOWLEDGED\"}"))
+                .andExpect(status().isNotFound());
+    }
 
     @Test
     void returnsDefaultSummaryPageForOnlyTheDemoUsersSites() throws Exception {

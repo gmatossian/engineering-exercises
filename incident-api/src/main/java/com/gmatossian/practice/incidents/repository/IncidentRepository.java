@@ -1,6 +1,8 @@
 package com.gmatossian.practice.incidents.repository;
 
 import com.gmatossian.practice.incidents.domain.Incident;
+import com.gmatossian.practice.incidents.domain.IncidentActivity;
+import com.gmatossian.practice.incidents.domain.IncidentStatus;
 import com.gmatossian.practice.incidents.repository.projection.IncidentSummary;
 
 import java.util.List;
@@ -23,5 +25,9 @@ public interface IncidentRepository {
     /** Loads any-status details and ordered history; the service must check site access. */
     Optional<Incident> findById(long id);
 
+    /** Returns false if the incident no longer has the expected status (or is missing). */
+    boolean updateStatus(long id, IncidentStatus expectedStatus, IncidentStatus newStatus);
 
+    /** Called in the same service transaction as the status change. */
+    void addActivity(long incidentId, IncidentActivity activity);
 }

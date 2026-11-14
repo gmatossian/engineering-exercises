@@ -104,7 +104,31 @@ public class JdbcIncidentRepository implements IncidentRepository {
                         row.status(), row.occurredAt(), row.description(), loadActivityHistory(id)));
     }
 
+    @Override
+    public boolean updateStatus(long id, IncidentStatus expectedStatus, IncidentStatus newStatus) {
+        // Only update the state that the service actually checked.
+        return jdbc.sql("""
+                        UPDATE incidents SET status = :newStatus
+                        WHERE id = :id AND status = :expectedStatus
+                        """)
+                .param("id", id)
+                .param("expectedStatus", expectedStatus.name())
+                .param("newStatus", newStatus.name())
+                .update() == 1;
+    }
 
+    @Override
+    public void addActivity(long incidentId, IncidentActivity activity) {
+        jdbc.sql("""
+                        INSERT INTO incident_activities (incident_id, action, actor_id, occurred_at)
+                        VALUES (:incidentId, :action, :actorId, :occurredAt)
+                        """)
+                .param("incidentId", incidentId)
+                .param("action", activity.action())
+                .param("actorId", activity.actorId())
+                .param("occurredAt", activity.occurredAt().atOffset(ZoneOffset.UTC))
+                .update();
+    }
 
     private List<IncidentActivity> loadActivityHistory(long incidentId) {
         return jdbc.sql("""
