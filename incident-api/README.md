@@ -38,7 +38,7 @@ Use the requests available at this checkpoint in [requests.http](requests.http).
 - `GET /incidents/{id}`: any-status details, description and chronological activity history. Missing incidents are 404; unauthorized incidents or empty access scope are 403. Domain objects, internal search projections and HTTP DTOs remain separate.
 - `PATCH /incidents/{id}`: OPEN → ACKNOWLEDGED/RESOLVED; ACKNOWLEDGED → RESOLVED; no reopening. Requesting the current status is a successful no-op. Conditional SQL checks the previously read status; a mismatch or forbidden transition is 409. Missing/null status and malformed input are 400. The status update and history insert share one service transaction; failure rolls both back. The fixed actor is `demo-user`.
 
-Checkpoint verification target: **64 passing tests**. Verification covers the current features, with further tests introduced alongside later endpoints.
+Final checkpoint verified with **64 passing tests**, zero failures/errors/skips. The executable JAR also builds successfully.
 
 ## Scope and limitations
 
@@ -51,3 +51,52 @@ Checkpoint verification target: **64 passing tests**. Verification covers the cu
 - The conditional update checks server-read status, not a client-supplied version/ETag. It does not detect every kind of stale browser view.
 
 Tags: `java`, `spring-boot`, `spring-mvc`, `rest-api`, `filtering`, `cursor-pagination`, `spring-jdbc`, `jdbc-client`, `h2`, `in-memory-database`, `transactions`, `conditional-update`, `activity-history`, `exception-handling`, `mockmvc`.
+
+## Development walkthrough
+
+The following commits reconstruct logical implementation steps. Each checkpoint
+was assembled from the existing exercise and tested before its commit; changes
+inside shared controller/service/repository files are introduced with the
+feature that needs them. The sequence is not the original chronological history.
+
+| Step | Changes | Code at this checkpoint | Passing tests |
+| --- | --- | --- | --- |
+| 1 | [create Spring Boot scaffold](https://github.com/gmatossian/engineering-exercises/commit/01a8fa9eedf4cf68a06fb968a09b85b6402caa7d) | [Browse snapshot](https://github.com/gmatossian/engineering-exercises/tree/01a8fa9eedf4cf68a06fb968a09b85b6402caa7d/incident-api) | 1 |
+| 2 | [add incident domain model](https://github.com/gmatossian/engineering-exercises/commit/8f5cd824820974bf5c7deb8bf833e7c4c855eacb) | [Browse snapshot](https://github.com/gmatossian/engineering-exercises/tree/8f5cd824820974bf5c7deb8bf833e7c4c855eacb/incident-api) | 1 |
+| 3 | [configure H2 persistence and fixtures](https://github.com/gmatossian/engineering-exercises/commit/9944d8bb031d02f83144a51e28a60b0b0184e141) | [Browse snapshot](https://github.com/gmatossian/engineering-exercises/tree/9944d8bb031d02f83144a51e28a60b0b0184e141/incident-api) | 3 |
+| 4 | [implement filtered search and cursor pagination](https://github.com/gmatossian/engineering-exercises/commit/6f5a4870b9159ebb23e23fa86fe857ece5fb434a) | [Browse snapshot](https://github.com/gmatossian/engineering-exercises/tree/6f5a4870b9159ebb23e23fa86fe857ece5fb434a/incident-api) | 42 |
+| 5 | [implement incident details and activity history](https://github.com/gmatossian/engineering-exercises/commit/05d9dd33c8d15a8c3b4f750122691a5f1f5315e9) | [Browse snapshot](https://github.com/gmatossian/engineering-exercises/tree/05d9dd33c8d15a8c3b4f750122691a5f1f5315e9/incident-api) | 55 |
+| 6 | [implement transactional status updates](https://github.com/gmatossian/engineering-exercises/commit/37e1b7252d6849ec7322f3a3cda2bee94c514af2) | [Browse snapshot](https://github.com/gmatossian/engineering-exercises/tree/37e1b7252d6849ec7322f3a3cda2bee94c514af2/incident-api) | 64 |
+
+The first two checkpoints have one application context-load test each; this does
+not establish comprehensive domain-model test coverage. Later checkpoints add
+fixture, JDBC, service, codec and MVC behavior tests alongside their features.
+All checkpoints were tested on Temurin Java 21 using the Maven wrapper with
+cached dependencies (`--offline`). The final checkpoint also passed `verify`.
+
+A separate packaged-JAR smoke check verified health, filtered pagination and
+continuation, incident details, 400/403/404 errors, acknowledgement, same-status
+retry without duplicate history, resolution and a forbidden transition (409).
+That process used an isolated in-memory database and was stopped afterward.
+
+### Reviewing a step
+
+Use a change link above for its diff, or a snapshot link for the runnable project
+at that step. Locally, from the repository root, inspect a commit with:
+
+```sh
+git show <commit> -- incident-api/
+```
+
+Keep these commits when merging this walkthrough: use a merge commit or rebase
+merge, not squash merge. Future work can add ordinary incremental commits.
+
+### Publishing cleanup
+
+The final Java source and tests are byte-identical to the working exercise.
+The POM, application configuration, schema and wrapper are preserved. Publishing
+changes are limited to portable README documentation, corrected/expanded HTTP
+request examples and a trailing-blank-line cleanup in the seed SQL. Local IDE
+settings, a machine-specific run configuration, build output and private
+interview/application material are excluded. Fixtures are fictional; the empty
+H2 password belongs only to the embedded local demo database.
