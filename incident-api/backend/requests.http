@@ -1,0 +1,52 @@
+@baseUrl = http://localhost:8081
+
+### Application health
+GET {{baseUrl}}/actuator/health
+
+### First page: the fixed demo scope includes site-a and site-b
+GET {{baseUrl}}/incidents?limit=20
+Accept: application/json
+
+### Filtered first page (eight matching fixtures, so limit 3 exercises pagination)
+GET {{baseUrl}}/incidents?siteId=site-a&severity=HIGH&limit=3
+Accept: application/json
+
+### Continuation: copy nextCursor from the filtered response and keep its filters
+GET {{baseUrl}}/incidents?siteId=site-a&severity=HIGH&limit=3&cursor=PASTE_NEXT_CURSOR_HERE
+Accept: application/json
+
+### Forbidden site
+GET {{baseUrl}}/incidents?siteId=site-c
+
+### Invalid limit
+GET {{baseUrl}}/incidents?limit=101
+
+### Details with ordered activity history
+GET {{baseUrl}}/incidents/28
+
+### Details with empty history
+GET {{baseUrl}}/incidents/4
+
+### Forbidden incident
+GET {{baseUrl}}/incidents/3
+
+### Missing incident
+GET {{baseUrl}}/incidents/9999
+
+### Acknowledge; repeating the request does not duplicate history
+PATCH {{baseUrl}}/incidents/1
+Content-Type: application/json
+
+{"status":"ACKNOWLEDGED"}
+
+### Resolve
+PATCH {{baseUrl}}/incidents/1
+Content-Type: application/json
+
+{"status":"RESOLVED"}
+
+### Conflict: resolved incidents cannot be reopened
+PATCH {{baseUrl}}/incidents/64
+Content-Type: application/json
+
+{"status":"OPEN"}
