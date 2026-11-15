@@ -1,0 +1,435 @@
+openapi: 3.1.0
+info:
+  title: Incident API exercise
+  version: 0.0.1
+  description: 'Contract for the current local exercise, reviewed against controller, DTOs, service and
+    repository. No authentication: the server supplies fixed demo sites site-a/site-b and actor demo-user.
+    No sites endpoint or CORS configuration is implemented. See README.md for integration behaviour and
+    examples.'
+servers:
+- url: http://127.0.0.1:8081
+  description: Local backend
+security: []
+tags:
+- name: Incidents
+- name: Health
+paths:
+  /incidents:
+    get:
+      operationId: searchIncidents
+      tags:
+      - Incidents
+      summary: List OPEN incidents in the demo user’s authorized sites
+      description: 'Filters are applied before pagination. Fixed ordering: occurredAt DESC, id DESC. No
+        status/type/date/sort filters, totals or numbered pages. Empty results are 200 with incidents:
+        [] and nextCursor: null. Data is current, not a snapshot.'
+      parameters:
+      - name: siteId
+        in: query
+        required: false
+        description: Omit for all authorized sites (site-a and site-b). An explicitly supplied site outside
+          that set, including an unknown/empty ID, is 403.
+        schema:
+          type: string
+        example: site-a
+      - name: severity
+        in: query
+        required: false
+        description: Omit for all severities. Enum values are case-sensitive.
+        schema:
+          $ref: '#/components/schemas/IncidentSeverity'
+      - name: limit
+        in: query
+        required: false
+        description: Maximum incidents returned, not a page number.
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          minimum: 1
+          maximum: 100
+      - name: cursor
+        in: query
+        required: false
+        description: Continuation token from the previous nextCursor. Omit initially. Pass unchanged and
+          retain the same filters/order. Blank, malformed or unparseable cursors return 400; the server
+          does not bind tokens to filters.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: One page of incident summaries.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentSearchResponse'
+              examples:
+                incident-search:
+                  externalValue: ./examples/incident-search.json
+                incident-search-next:
+                  externalValue: ./examples/incident-search-next.json
+                incident-search-final:
+                  externalValue: ./examples/incident-search-final.json
+                incident-search-empty:
+                  externalValue: ./examples/incident-search-empty.json
+        '400':
+          description: Invalid limit, cursor or query parameter type/enum.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                invalid-limit:
+                  externalValue: ./examples/invalid-limit.json
+                invalid-cursor:
+                  externalValue: ./examples/invalid-cursor.json
+                invalid-severity:
+                  externalValue: ./examples/invalid-severity.json
+        '403':
+          description: Requested site or incident is outside the fixed demo scope.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                forbidden:
+                  externalValue: ./examples/forbidden.json
+        '500':
+          description: Unexpected server error. The body is framework-controlled and not guaranteed by
+            this exercise; present a retryable error in the UI.
+  /incidents/{id}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: Numeric incident ID. No positive-only constraint is enforced; a missing numeric ID
+        returns 404.
+      schema:
+        type: integer
+        format: int64
+      example: 28
+    get:
+      operationId: getIncidentDetails
+      tags:
+      - Incidents
+      summary: Read incident details and activity history
+      description: Details can be fetched for OPEN, ACKNOWLEDGED or RESOLVED incidents, subject to site
+        access. The response is the detail object directly; no wrapper or cursor.
+      responses:
+        '200':
+          description: Incident details with history ordered oldest first.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentDetailResponse'
+              examples:
+                incident-details:
+                  externalValue: ./examples/incident-details.json
+                incident-details-empty-history:
+                  externalValue: ./examples/incident-details-empty-history.json
+        '400':
+          description: The path ID cannot be converted to a Java long.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                invalid-id:
+                  externalValue: ./examples/invalid-id.json
+        '403':
+          description: The incident exists but its site is outside the fixed demo scope.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: No incident with this ID exists.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                not-found:
+                  externalValue: ./examples/not-found.json
+        '500':
+          description: Unexpected server error. The body is framework-controlled and not guaranteed by
+            this exercise; present a retryable error in the UI.
+    patch:
+      operationId: updateIncidentStatus
+      tags:
+      - Incidents
+      summary: Acknowledge or resolve an incident
+      description: 'Allowed transitions: OPEN -> ACKNOWLEDGED or RESOLVED; ACKNOWLEDGED -> RESOLVED. RESOLVED
+        is terminal. Setting the current status is a successful no-op with no duplicate activity. Status
+        and history update atomically. A concurrent state mismatch or forbidden transition returns 409.
+        No client version/ETag or Idempotency-Key is used.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIncidentStatusRequest'
+            examples:
+              acknowledge:
+                value:
+                  status: ACKNOWLEDGED
+              resolve:
+                value:
+                  status: RESOLVED
+      responses:
+        '200':
+          description: Updated detail object, including server-generated activity. Same-status retry returns
+            unchanged details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentDetailResponse'
+              examples:
+                incident-updated:
+                  externalValue: ./examples/incident-updated.json
+                incident-update-retry:
+                  externalValue: ./examples/incident-update-retry.json
+                incident-resolved:
+                  externalValue: ./examples/incident-resolved.json
+        '400':
+          description: Missing/null status, or invalid numeric path ID.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                missing-status:
+                  externalValue: ./examples/missing-status.json
+                invalid-id:
+                  externalValue: ./examples/invalid-id.json
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultError'
+              examples:
+                unknown-status:
+                  externalValue: ./examples/unknown-status.json
+                malformed-json:
+                  externalValue: ./examples/malformed-json.json
+        '403':
+          description: The incident exists but its site is outside the fixed demo scope.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: No incident with this ID exists.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                not-found:
+                  externalValue: ./examples/not-found.json
+        '409':
+          description: Forbidden transition or concurrent state change; reload details before deciding
+            whether to retry.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                conflict:
+                  externalValue: ./examples/conflict.json
+        '500':
+          description: Unexpected server error. The body is framework-controlled and not guaranteed by
+            this exercise; present a retryable error in the UI.
+  /actuator/health:
+    get:
+      operationId: getHealth
+      tags:
+      - Health
+      summary: Check backend health
+      responses:
+        '200':
+          description: Backend is healthy.
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                health:
+                  externalValue: ./examples/health.json
+        '503':
+          description: An unhealthy component can cause the Actuator health endpoint to return 503.
+components:
+  schemas:
+    IncidentSeverity:
+      type: string
+      enum:
+      - LOW
+      - MEDIUM
+      - HIGH
+    IncidentStatus:
+      type: string
+      enum:
+      - OPEN
+      - ACKNOWLEDGED
+      - RESOLVED
+    IncidentSummaryResponse:
+      type: object
+      required:
+      - id
+      - siteId
+      - type
+      - severity
+      - status
+      - occurredAt
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Numeric incident ID; use this value in the path, without an INC- prefix.
+        siteId:
+          type: string
+          description: Site identifier, such as site-a. A display name is not supplied.
+        type:
+          type: string
+          description: Incident type code; currently a string, not a closed API enum.
+          examples:
+          - CAMERA_OFFLINE
+        severity:
+          $ref: '#/components/schemas/IncidentSeverity'
+        status:
+          $ref: '#/components/schemas/IncidentStatus'
+        occurredAt:
+          type: string
+          format: date-time
+          description: Occurrence instant, serialized as an ISO-8601 UTC timestamp.
+    IncidentDetailResponse:
+      type: object
+      required:
+      - id
+      - siteId
+      - type
+      - severity
+      - status
+      - occurredAt
+      - description
+      - activityHistory
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Numeric incident ID; use this value in the path, without an INC- prefix.
+        siteId:
+          type: string
+          description: Site identifier, such as site-a. A display name is not supplied.
+        type:
+          type: string
+          description: Incident type code; currently a string, not a closed API enum.
+          examples:
+          - CAMERA_OFFLINE
+        severity:
+          $ref: '#/components/schemas/IncidentSeverity'
+        status:
+          $ref: '#/components/schemas/IncidentStatus'
+        occurredAt:
+          type: string
+          format: date-time
+          description: Occurrence instant, serialized as an ISO-8601 UTC timestamp.
+        description:
+          type: string
+        activityHistory:
+          type: array
+          description: Oldest first; may be empty. Server owns entries, actor IDs and timestamps.
+          items:
+            $ref: '#/components/schemas/IncidentActivityResponse'
+    IncidentActivityResponse:
+      type: object
+      required:
+      - action
+      - actorId
+      - occurredAt
+      properties:
+        action:
+          type: string
+          description: Activity code, not a closed enum.
+          examples:
+          - CREATED
+          - ACKNOWLEDGED
+        actorId:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+    IncidentSearchResponse:
+      type: object
+      required:
+      - incidents
+      - nextCursor
+      properties:
+        incidents:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncidentSummaryResponse'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+          description: Opaque continuation token. Null means no further page for this request. Return
+            it unchanged with the same filters; omit on the first page.
+    UpdateIncidentStatusRequest:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          $ref: '#/components/schemas/IncidentStatus'
+      description: Only status is updated. OPEN is an enum value but reopening is forbidden; current status
+        is a successful no-op. Do not send actor/history/timestamps.
+    Problem:
+      type: object
+      required:
+      - status
+      - title
+      - detail
+      - instance
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: Optional problem type; not present in the captured application errors.
+        status:
+          type: integer
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri-reference
+    DefaultError:
+      type: object
+      required:
+      - timestamp
+      - status
+      - error
+      - path
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        path:
+          type: string
+      description: Spring default error body observed for malformed JSON and unrecognized status values;
+        differs from application Problem responses.
+    HealthResponse:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          type: string
+        groups:
+          type: array
+          items:
+            type: string

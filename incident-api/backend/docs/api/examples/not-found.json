@@ -1,0 +1,6 @@
+{
+  "detail": "Incident 9999 not found",
+  "instance": "/incidents/9999",
+  "status": 404,
+  "title": "Not Found"
+}

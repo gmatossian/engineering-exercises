@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_standard" name="shell-type"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    }
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #0a0e14;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+<body class="bg-[#0a0e14] text-[#e2e8f0] antialiased min-h-screen selection:bg-sky-500/20 selection:text-sky-300">
+<!-- TOP APP BAR -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-[#0a0e14]/90 backdrop-blur-md border-b border-[#1e293b]">
+<div class="h-16 w-full max-w-7xl mx-auto px-6 flex items-center justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-sky-400"></span>
+<span class="text-sm font-bold uppercase tracking-wider text-white">Incident Management</span>
+</div>
+<span class="text-xs text-slate-400 font-normal">Incidents requiring attention</span>
+</div>
+<!-- Single manual Refresh control -->
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-[#334155] bg-[#111722] hover:bg-[#1a2333] hover:border-slate-500 text-slate-200 text-xs font-semibold uppercase tracking-wider transition-all duration-150 active:scale-95 shadow-sm" id="top-refresh-btn" type="button">
+<svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-transform duration-300" fill="none" id="refresh-icon" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Refresh</span>
+</button>
+</div>
+</header>
+<!-- MAIN CONTENT CONTAINER -->
+<main class="w-full max-w-7xl mx-auto px-6 pt-24 pb-16">
+<div class="flex flex-col w-full">
+<!-- FILTER CONTROLS BAR -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-3.5 rounded-lg bg-[#111722] border border-[#1e293b] mb-6 shadow-sm">
+<!-- Left: Site & Severity Filters -->
+<div class="flex flex-col xl:flex-row xl:items-center gap-4">
+<!-- Facility Filters -->
+<div class="flex flex-wrap items-center gap-2">
+<span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mr-1">Facility:</span>
+<div class="inline-flex flex-wrap gap-1" id="site-filters">
+<button class="site-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-sky-500 text-slate-950 font-semibold shadow-sm" data-site="all" type="button">All Sites</button>
+<button class="site-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-[#1a2333] text-slate-300 hover:text-white hover:bg-[#222e42] border border-transparent" data-site="Austin Plant #4" type="button">Austin Plant #4</button>
+<button class="site-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-[#1a2333] text-slate-300 hover:text-white hover:bg-[#222e42] border border-transparent" data-site="Houston Terminal B" type="button">Houston Terminal B</button>
+<button class="site-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-[#1a2333] text-slate-300 hover:text-white hover:bg-[#222e42] border border-transparent" data-site="Chicago Logistics Hub" type="button">Chicago Logistics Hub</button>
+<button class="site-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-[#1a2333] text-slate-300 hover:text-white hover:bg-[#222e42] border border-transparent" data-site="Seattle Tech Center" type="button">Seattle Tech Center</button>
+</div>
+</div>
+<!-- Divider on desktop -->
+<div class="hidden xl:block w-px h-5 bg-[#253246]"></div>
+<!-- Severity Filters -->
+<div class="flex flex-wrap items-center gap-2">
+<span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mr-1">Severity:</span>
+<div class="inline-flex gap-1" id="severity-filters">
+<button class="sev-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-sky-500 text-slate-950 font-semibold shadow-sm" data-sev="all" type="button">All Severities</button>
+<button class="sev-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-[#1a2333] text-slate-300 hover:text-red-400 hover:bg-[#222e42] border border-transparent" data-sev="HIGH" type="button">HIGH</button>
+<button class="sev-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-[#1a2333] text-slate-300 hover:text-amber-400 hover:bg-[#222e42] border border-transparent" data-sev="MEDIUM" type="button">MEDIUM</button>
+<button class="sev-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-[#1a2333] text-slate-300 hover:text-sky-400 hover:bg-[#222e42] border border-transparent" data-sev="LOW" type="button">LOW</button>
+</div>
+</div>
+</div>
+<!-- Right: Clear Filters Action -->
+<div class="flex items-center self-start lg:self-auto">
+<button class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium text-slate-400 hover:text-slate-100 hover:bg-[#1a2333] transition-colors" id="clear-filters-btn" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Clear filters</span>
+</button>
+</div>
+</div>
+<!-- STREAM COUNTER -->
+<div class="flex items-center justify-between pb-3">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+<span class="text-xs font-medium text-slate-300" id="list-meta-counter">8 incidents loaded · Newest first</span>
+</div>
+</div>
+<!-- INCIDENT CARDS STREAM -->
+<div class="flex flex-col gap-2" id="incident-list">
+<!-- CARD 1 -->
+<article class="incident-card group relative flex flex-col md:flex-row md:items-center justify-between px-4 py-3.5 rounded-lg bg-[#111722] border border-[#1e293b] hover:border-slate-600/60 hover:bg-[#141c2b] transition-all cursor-pointer shadow-sm" data-severity="HIGH" data-site="Houston Terminal B">
+<div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg bg-red-500"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-3 pl-1">
+<div class="flex items-center gap-2.5">
+<span class="text-xs font-semibold tracking-wider text-sky-400 font-mono">INC-8492</span>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#182232] border border-[#233147] text-slate-300 text-xs">
+<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Houston Terminal B</span>
+</div>
+</div>
+<span class="text-sm font-semibold text-slate-100 tracking-tight">Gas Leak Detected</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2 md:mt-0 pl-1 md:pl-0">
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
+                HIGH
+              </span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                OPEN
+              </span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-400 text-xs">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>12 mins ago (14:32 CST)</span>
+</div>
+</div>
+</article>
+<!-- CARD 2 -->
+<article class="incident-card group relative flex flex-col md:flex-row md:items-center justify-between px-4 py-3.5 rounded-lg bg-[#111722] border border-[#1e293b] hover:border-slate-600/60 hover:bg-[#141c2b] transition-all cursor-pointer shadow-sm" data-severity="HIGH" data-site="Austin Plant #4">
+<div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg bg-red-500"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-3 pl-1">
+<div class="flex items-center gap-2.5">
+<span class="text-xs font-semibold tracking-wider text-sky-400 font-mono">INC-8491</span>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#182232] border border-[#233147] text-slate-300 text-xs">
+<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Austin Plant #4</span>
+</div>
+</div>
+<span class="text-sm font-semibold text-slate-100 tracking-tight">Chemical Spill Alert</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2 md:mt-0 pl-1 md:pl-0">
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
+                HIGH
+              </span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                OPEN
+              </span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-400 text-xs">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>21 mins ago (14:23 CST)</span>
+</div>
+</div>
+</article>
+<!-- CARD 3 -->
+<article class="incident-card group relative flex flex-col md:flex-row md:items-center justify-between px-4 py-3.5 rounded-lg bg-[#111722] border border-[#1e293b] hover:border-slate-600/60 hover:bg-[#141c2b] transition-all cursor-pointer shadow-sm" data-severity="MEDIUM" data-site="Chicago Logistics Hub">
+<div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg bg-amber-500"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-3 pl-1">
+<div class="flex items-center gap-2.5">
+<span class="text-xs font-semibold tracking-wider text-sky-400 font-mono">INC-8488</span>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#182232] border border-[#233147] text-slate-300 text-xs">
+<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Chicago Logistics Hub</span>
+</div>
+</div>
+<span class="text-sm font-semibold text-slate-100 tracking-tight">Safety Guard Override</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2 md:mt-0 pl-1 md:pl-0">
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                MEDIUM
+              </span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                OPEN
+              </span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-400 text-xs">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>35 mins ago (14:09 CST)</span>
+</div>
+</div>
+</article>
+<!-- CARD 4 -->
+<article class="incident-card group relative flex flex-col md:flex-row md:items-center justify-between px-4 py-3.5 rounded-lg bg-[#111722] border border-[#1e293b] hover:border-slate-600/60 hover:bg-[#141c2b] transition-all cursor-pointer shadow-sm" data-severity="HIGH" data-site="Houston Terminal B">
+<div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg bg-red-500"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-3 pl-1">
+<div class="flex items-center gap-2.5">
+<span class="text-xs font-semibold tracking-wider text-sky-400 font-mono">INC-8485</span>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#182232] border border-[#233147] text-slate-300 text-xs">
+<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Houston Terminal B</span>
+</div>
+</div>
+<span class="text-sm font-semibold text-slate-100 tracking-tight">Equipment Failure</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2 md:mt-0 pl-1 md:pl-0">
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
+                HIGH
+              </span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                OPEN
+              </span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-400 text-xs">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>48 mins ago (13:56 CST)</span>
+</div>
+</div>
+</article>
+<!-- CARD 5 -->
+<article class="incident-card group relative flex flex-col md:flex-row md:items-center justify-between px-4 py-3.5 rounded-lg bg-[#111722] border border-[#1e293b] hover:border-slate-600/60 hover:bg-[#141c2b] transition-all cursor-pointer shadow-sm" data-severity="LOW" data-site="Seattle Tech Center">
+<div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg bg-sky-400"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-3 pl-1">
+<div class="flex items-center gap-2.5">
+<span class="text-xs font-semibold tracking-wider text-sky-400 font-mono">INC-8480</span>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#182232] border border-[#233147] text-slate-300 text-xs">
+<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Seattle Tech Center</span>
+</div>
+</div>
+<span class="text-sm font-semibold text-slate-100 tracking-tight">Safety Guard Override</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2 md:mt-0 pl-1 md:pl-0">
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-sky-500/10 text-sky-400 border border-sky-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                LOW
+              </span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                OPEN
+              </span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-400 text-xs">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>1 hr ago (13:44 CST)</span>
+</div>
+</div>
+</article>
+<!-- CARD 6 -->
+<article class="incident-card group relative flex flex-col md:flex-row md:items-center justify-between px-4 py-3.5 rounded-lg bg-[#111722] border border-[#1e293b] hover:border-slate-600/60 hover:bg-[#141c2b] transition-all cursor-pointer shadow-sm" data-severity="MEDIUM" data-site="Austin Plant #4">
+<div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg bg-amber-500"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-3 pl-1">
+<div class="flex items-center gap-2.5">
+<span class="text-xs font-semibold tracking-wider text-sky-400 font-mono">INC-8477</span>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#182232] border border-[#233147] text-slate-300 text-xs">
+<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Austin Plant #4</span>
+</div>
+</div>
+<span class="text-sm font-semibold text-slate-100 tracking-tight">Equipment Failure</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2 md:mt-0 pl-1 md:pl-0">
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                MEDIUM
+              </span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                OPEN
+              </span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-400 text-xs">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>1 hr 15 mins ago (13:29 CST)</span>
+</div>
+</div>
+</article>
+<!-- CARD 7 -->
+<article class="incident-card group relative flex flex-col md:flex-row md:items-center justify-between px-4 py-3.5 rounded-lg bg-[#111722] border border-[#1e293b] hover:border-slate-600/60 hover:bg-[#141c2b] transition-all cursor-pointer shadow-sm" data-severity="MEDIUM" data-site="Chicago Logistics Hub">
+<div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg bg-amber-500"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-3 pl-1">
+<div class="flex items-center gap-2.5">
+<span class="text-xs font-semibold tracking-wider text-sky-400 font-mono">INC-8474</span>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#182232] border border-[#233147] text-slate-300 text-xs">
+<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Chicago Logistics Hub</span>
+</div>
+</div>
+<span class="text-sm font-semibold text-slate-100 tracking-tight">Chemical Spill Alert</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2 md:mt-0 pl-1 md:pl-0">
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                MEDIUM
+              </span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                OPEN
+              </span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-400 text-xs">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>1 hr 40 mins ago (13:04 CST)</span>
+</div>
+</div>
+</article>
+<!-- CARD 8 -->
+<article class="incident-card group relative flex flex-col md:flex-row md:items-center justify-between px-4 py-3.5 rounded-lg bg-[#111722] border border-[#1e293b] hover:border-slate-600/60 hover:bg-[#141c2b] transition-all cursor-pointer shadow-sm" data-severity="LOW" data-site="Seattle Tech Center">
+<div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg bg-sky-400"></div>
+<div class="flex flex-col md:flex-row md:items-center gap-3 pl-1">
+<div class="flex items-center gap-2.5">
+<span class="text-xs font-semibold tracking-wider text-sky-400 font-mono">INC-8470</span>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#182232] border border-[#233147] text-slate-300 text-xs">
+<svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Seattle Tech Center</span>
+</div>
+</div>
+<span class="text-sm font-semibold text-slate-100 tracking-tight">Gas Leak Detected</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2 md:mt-0 pl-1 md:pl-0">
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-sky-500/10 text-sky-400 border border-sky-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                LOW
+              </span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                OPEN
+              </span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-400 text-xs">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>2 hrs ago (12:44 CST)</span>
+</div>
+</div>
+</article>
+</div>
+<!-- BOTTOM LOAD MORE ACTION -->
+<div class="mt-8 flex flex-col items-center justify-center gap-2">
+<button class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#111722] hover:bg-[#1a2333] border border-[#1e293b] hover:border-slate-500 text-slate-200 text-xs font-semibold tracking-wide uppercase transition-all shadow-sm active:scale-95" id="load-more-btn" type="button">
+<span>Load more incidents</span>
+<svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<span class="text-[11px] text-slate-500 flex items-center gap-1">
+<svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.75" viewbox="0 0 24 24">
+<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+          Appends older historical logs to bottom of feed
+        </span>
+</div>
+</div>
+</main>
+<!-- INTERACTIVITY SCRIPT -->
+<script>
+    (function() {
+      let currentSite = 'all';
+      let currentSeverity = 'all';
+
+      const siteButtons = document.querySelectorAll('.site-filter-btn');
+      const sevButtons = document.querySelectorAll('.sev-filter-btn');
+      const cards = document.querySelectorAll('.incident-card');
+      const metaCounter = document.getElementById('list-meta-counter');
+      const clearBtn = document.getElementById('clear-filters-btn');
+      const topRefreshBtn = document.getElementById('top-refresh-btn');
+      const refreshIcon = document.getElementById('refresh-icon');
+      const loadMoreBtn = document.getElementById('load-more-btn');
+      const listContainer = document.getElementById('incident-list');
+
+      function updateCardVisibility() {
+        let visibleCount = 0;
+        const currentCards = document.querySelectorAll('.incident-card');
+        currentCards.forEach(card => {
+          const cardSite = card.getAttribute('data-site');
+          const cardSev = card.getAttribute('data-severity');
+          const matchSite = (currentSite === 'all' || cardSite === currentSite);
+          const matchSev = (currentSeverity === 'all' || cardSev === currentSeverity);
+
+          if (matchSite && matchSev) {
+            card.classList.remove('hidden');
+            visibleCount++;
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+        if (metaCounter) {
+          metaCounter.textContent = `${visibleCount} incident${visibleCount === 1 ? '' : 's'} loaded · Newest first`;
+        }
+      }
+
+      siteButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentSite = btn.getAttribute('data-site');
+          siteButtons.forEach(b => {
+            b.className = 'site-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-[#1a2333] text-slate-300 hover:text-white hover:bg-[#222e42] border border-transparent';
+          });
+          btn.className = 'site-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-sky-500 text-slate-950 font-semibold shadow-sm';
+          updateCardVisibility();
+        });
+      });
+
+      sevButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentSeverity = btn.getAttribute('data-sev');
+          sevButtons.forEach(b => {
+            b.className = 'sev-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-[#1a2333] text-slate-300 hover:text-white hover:bg-[#222e42] border border-transparent';
+          });
+          btn.className = 'sev-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-sky-500 text-slate-950 font-semibold shadow-sm';
+          updateCardVisibility();
+        });
+      });
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          currentSite = 'all';
+          currentSeverity = 'all';
+          siteButtons.forEach((b, idx) => {
+            b.className = idx === 0
+              ? 'site-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-sky-500 text-slate-950 font-semibold shadow-sm'
+              : 'site-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-[#1a2333] text-slate-300 hover:text-white hover:bg-[#222e42] border border-transparent';
+          });
+          sevButtons.forEach((b, idx) => {
+            b.className = idx === 0
+              ? 'sev-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-sky-500 text-slate-950 font-semibold shadow-sm'
+              : 'sev-filter-btn px-2.5 py-1 rounded text-xs font-medium transition-all bg-[#1a2333] text-slate-300 hover:text-white hover:bg-[#222e42] border border-transparent';
+          });
+          updateCardVisibility();
+        });
+      }
+
+      if (topRefreshBtn && refreshIcon) {
+        topRefreshBtn.addEventListener('click', () => {
+          refreshIcon.classList.add('animate-spin');
+          setTimeout(() => {
+            refreshIcon.classList.remove('animate-spin');
+          }, 600);
+        });
+      }
+
+      if (loadMoreBtn && listContainer) {
+        let loaded = false;
+        loadMoreBtn.addEventListener('click', () => {
+          if (loaded) return;
+          loaded = true;
+          
+          const older = [
+            { id: 'INC-8468', site: 'Austin Plant #4', title: 'Safety Guard Override', sev: 'LOW', stripe: 'bg-sky-400', badgeClass: 'bg-sky-500/10 text-sky-400 border border-sky-500/20', dotClass: 'bg-sky-400', time: '2 hrs 25 mins ago (12:19 CST)' },
+            { id: 'INC-8465', site: 'Houston Terminal B', title: 'Chemical Spill Alert', sev: 'HIGH', stripe: 'bg-red-500', badgeClass: 'bg-red-500/10 text-red-400 border border-red-500/20', dotClass: 'bg-red-400 animate-pulse', time: '2 hrs 50 mins ago (11:54 CST)' }
+          ];
+
+          older.forEach(item => {
+            const art = document.createElement('article');
+            art.className = 'incident-card group relative flex flex-col md:flex-row md:items-center justify-between px-4 py-3.5 rounded-lg bg-[#111722] border border-[#1e293b] hover:border-slate-600/60 hover:bg-[#141c2b] transition-all cursor-pointer shadow-sm';
+            art.setAttribute('data-severity', item.sev);
+            art.setAttribute('data-site', item.site);
+            art.innerHTML = `
+              <div class="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg ${item.stripe}"></div>
+              <div class="flex flex-col md:flex-row md:items-center gap-3 pl-1">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xs font-semibold tracking-wider text-sky-400 font-mono">${item.id}</span>
+                  <div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#182232] border border-[#233147] text-slate-300 text-xs">
+                    <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    <span>${item.site}</span>
+                  </div>
+                </div>
+                <span class="text-sm font-semibold text-slate-100 tracking-tight">${item.title}</span>
+              </div>
+              <div class="flex flex-wrap items-center gap-4 mt-2 md:mt-0 pl-1 md:pl-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider ${item.badgeClass}">
+                    <span class="w-1.5 h-1.5 rounded-full ${item.dotClass}"></span>
+                    ${item.sev}
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                    OPEN
+                  </span>
+                </div>
+                <div class="flex items-center gap-1.5 text-slate-400 text-xs">
+                  <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>${item.time}</span>
+                </div>
+              </div>
+            `;
+            listContainer.appendChild(art);
+          });
+
+          updateCardVisibility();
+          loadMoreBtn.classList.add('opacity-40', 'cursor-not-allowed');
+          loadMoreBtn.disabled = true;
+          loadMoreBtn.querySelector('span').textContent = 'All incidents loaded';
+        });
+      }
+    })();
+  </script>
+</body></html>

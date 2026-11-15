@@ -1,0 +1,6 @@
+{
+  "detail": "Invalid cursor",
+  "instance": "/incidents",
+  "status": 400,
+  "title": "Bad Request"
+}

@@ -1,0 +1,6 @@
+{
+  "detail": "Requested site is outside the authorized scope",
+  "instance": "/incidents",
+  "status": 403,
+  "title": "Forbidden"
+}

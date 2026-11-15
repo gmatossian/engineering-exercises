@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Incident Management - Detail View</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      display: block;
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-base": "#0B0F17",
+            "surface-dim": "#080c13",
+            "surface-raised": "#111827",
+            "surface-elevated": "#1a2234",
+            "surface-overlay": "#131b2c",
+            "border-subtle": "#1e293b",
+            "border-strong": "#334155",
+            "primary": "#38bdf8",
+            "primary-dark": "#0284c7",
+            "status-danger": "#ef4444",
+            "status-warning": "#f59e0b",
+            "status-success": "#10b981",
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#0B0F17] text-slate-100 antialiased min-h-screen relative overflow-hidden">
+<!-- ============================================================== -->
+<!-- 1. FULL BACKGROUND CONTINUITY: EXACT CLEAN DESKTOP LIST SCREEN -->
+<!-- ============================================================== -->
+<div aria-hidden="true" class="w-full min-h-screen flex flex-col filter blur-[1.5px] opacity-35 select-none pointer-events-none">
+<!-- Top Nav Header -->
+<header class="h-16 w-full border-b border-border-subtle bg-surface-base/90 px-8 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#38bdf8]"></span>
+<div>
+<h1 class="text-sm font-bold tracking-wider uppercase text-white">Incident Management</h1>
+<p class="text-xs text-slate-400">Incidents requiring attention</p>
+</div>
+</div>
+<div>
+<button class="inline-flex items-center gap-2 px-3 py-1.5 rounded border border-border-strong text-xs font-semibold uppercase tracking-wider text-slate-300" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+          Refresh
+        </button>
+</div>
+</header>
+<!-- Main Incident List Layout -->
+<main class="w-full max-w-7xl mx-auto px-8 py-6 flex flex-col gap-4">
+<!-- Filter Bar -->
+<div class="flex items-center justify-between pb-2 border-b border-border-subtle/50">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 bg-surface-raised px-3 py-1.5 rounded border border-border-subtle text-xs text-slate-300">
+<span class="text-slate-400 font-medium">Site:</span>
+<span class="font-semibold text-white">All Sites</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-raised px-3 py-1.5 rounded border border-border-subtle text-xs text-slate-300">
+<span class="text-slate-400 font-medium">Severity:</span>
+<span class="font-semibold text-white">High &amp; Critical</span>
+</div>
+</div>
+<div class="text-xs font-mono text-slate-400">
+          8 incidents loaded · Newest first
+        </div>
+</div>
+<!-- 8 OPEN Incident Cards -->
+<div class="flex flex-col gap-2">
+<!-- 1. INC-8492 (Gas Leak) -->
+<div class="p-3.5 rounded bg-surface-elevated/70 border-l-4 border-status-danger border border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="font-mono text-xs font-semibold text-primary">INC-8492</span>
+<span class="px-2 py-0.5 rounded bg-red-950/60 text-status-danger text-[11px] font-bold tracking-wider uppercase border border-red-800/40">HIGH</span>
+<span class="text-sm font-semibold text-white">Gas Leak Detected</span>
+<span class="text-xs text-slate-400">Houston Terminal B</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="px-2 py-0.5 rounded bg-amber-950/60 text-status-warning text-[11px] font-bold uppercase border border-amber-800/40">OPEN</span>
+<span class="font-mono text-xs text-slate-400">14:32 CST</span>
+</div>
+</div>
+<!-- 2. INC-8491 -->
+<div class="p-3.5 rounded bg-surface-raised border border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="font-mono text-xs text-slate-400">INC-8491</span>
+<span class="px-2 py-0.5 rounded bg-amber-950/60 text-status-warning text-[11px] font-bold tracking-wider uppercase border border-amber-800/40">MED</span>
+<span class="text-sm text-slate-200">HVAC Pressure Fluctuation</span>
+<span class="text-xs text-slate-400">Control Substation 04</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="px-2 py-0.5 rounded bg-amber-950/60 text-status-warning text-[11px] font-bold uppercase border border-amber-800/40">OPEN</span>
+<span class="font-mono text-xs text-slate-400">14:18 CST</span>
+</div>
+</div>
+<!-- 3. INC-8490 -->
+<div class="p-3.5 rounded bg-surface-raised border border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="font-mono text-xs text-slate-400">INC-8490</span>
+<span class="px-2 py-0.5 rounded bg-red-950/60 text-status-danger text-[11px] font-bold tracking-wider uppercase border border-red-800/40">HIGH</span>
+<span class="text-sm text-slate-200">Access Gateway Breach Attempt</span>
+<span class="text-xs text-slate-400">South Perimeter Gate 2</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="px-2 py-0.5 rounded bg-amber-950/60 text-status-warning text-[11px] font-bold uppercase border border-amber-800/40">OPEN</span>
+<span class="font-mono text-xs text-slate-400">13:58 CST</span>
+</div>
+</div>
+<!-- 4. INC-8489 -->
+<div class="p-3.5 rounded bg-surface-raised border border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="font-mono text-xs text-slate-400">INC-8489</span>
+<span class="px-2 py-0.5 rounded bg-red-950/60 text-status-danger text-[11px] font-bold tracking-wider uppercase border border-red-800/40">CRITICAL</span>
+<span class="text-sm text-slate-200">Transformer Oil Overheat</span>
+<span class="text-xs text-slate-400">Baytown Substation 12</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="px-2 py-0.5 rounded bg-amber-950/60 text-status-warning text-[11px] font-bold uppercase border border-amber-800/40">OPEN</span>
+<span class="font-mono text-xs text-slate-400">13:42 CST</span>
+</div>
+</div>
+<!-- 5. INC-8488 -->
+<div class="p-3.5 rounded bg-surface-raised border border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="font-mono text-xs text-slate-400">INC-8488</span>
+<span class="px-2 py-0.5 rounded bg-amber-950/60 text-status-warning text-[11px] font-bold tracking-wider uppercase border border-amber-800/40">MED</span>
+<span class="text-sm text-slate-200">Boiler Feed Pump Vibrations</span>
+<span class="text-xs text-slate-400">Corpus Christi Refinery</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="px-2 py-0.5 rounded bg-amber-950/60 text-status-warning text-[11px] font-bold uppercase border border-amber-800/40">OPEN</span>
+<span class="font-mono text-xs text-slate-400">13:25 CST</span>
+</div>
+</div>
+<!-- 6. INC-8487 -->
+<div class="p-3.5 rounded bg-surface-raised border border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="font-mono text-xs text-slate-400">INC-8487</span>
+<span class="px-2 py-0.5 rounded bg-red-950/60 text-status-danger text-[11px] font-bold tracking-wider uppercase border border-red-800/40">HIGH</span>
+<span class="text-sm text-slate-200">Primary Feed Valve Anomaly</span>
+<span class="text-xs text-slate-400">Houston Terminal C</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="px-2 py-0.5 rounded bg-amber-950/60 text-status-warning text-[11px] font-bold uppercase border border-amber-800/40">OPEN</span>
+<span class="font-mono text-xs text-slate-400">12:59 CST</span>
+</div>
+</div>
+<!-- 7. INC-8486 -->
+<div class="p-3.5 rounded bg-surface-raised border border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="font-mono text-xs text-slate-400">INC-8486</span>
+<span class="px-2 py-0.5 rounded bg-amber-950/60 text-status-warning text-[11px] font-bold tracking-wider uppercase border border-amber-800/40">MED</span>
+<span class="text-sm text-slate-200">Telemetry Feed Dropped</span>
+<span class="text-xs text-slate-400">Pipeline Junction 14</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="px-2 py-0.5 rounded bg-amber-950/60 text-status-warning text-[11px] font-bold uppercase border border-amber-800/40">OPEN</span>
+<span class="font-mono text-xs text-slate-400">12:44 CST</span>
+</div>
+</div>
+<!-- 8. INC-8485 -->
+<div class="p-3.5 rounded bg-surface-raised border border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="font-mono text-xs text-slate-400">INC-8485</span>
+<span class="px-2 py-0.5 rounded bg-red-950/60 text-status-danger text-[11px] font-bold tracking-wider uppercase border border-red-800/40">HIGH</span>
+<span class="text-sm text-slate-200">Optical Line Latency Critical Alert</span>
+<span class="text-xs text-slate-400">Data Core North</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="px-2 py-0.5 rounded bg-amber-950/60 text-status-warning text-[11px] font-bold uppercase border border-amber-800/40">OPEN</span>
+<span class="font-mono text-xs text-slate-400">12:15 CST</span>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- ============================================================== -->
+<!-- 2. DARK SEMI-TRANSPARENT BACKDROP (rgba(5, 8, 15, 0.75))        -->
+<!-- ============================================================== -->
+<div class="fixed inset-0 z-40 bg-[rgba(5,8,15,0.75)] backdrop-blur-sm transition-opacity duration-200" id="backdrop" onclick="closeSheet()">
+</div>
+<!-- ============================================================== -->
+<!-- 3. SLIDE-OVER DETAIL SHEET (CENTERED MODAL / SLIDE-OVER)      -->
+<!-- ============================================================== -->
+<aside aria-labelledby="sheet-incident-title" aria-modal="true" class="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl bg-[#111827] border-t border-x border-[#1e293b] rounded-t-2xl shadow-2xl flex flex-col max-h-[90vh] transition-transform duration-300 ease-out" id="incident-drawer" role="dialog">
+<!-- DRAG PILL / HANDLE & CLOSE ROW -->
+<div class="w-full flex items-center justify-between px-6 pt-3 pb-1 shrink-0">
+<div class="w-8"></div>
+<!-- Center Pill Handle -->
+<div class="w-12 h-1 rounded-full bg-slate-700/80"></div>
+<!-- Close Button with Inline SVG -->
+<button aria-label="Close Incident Panel" class="w-8 h-8 rounded flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors" onclick="closeSheet()" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<line x1="18" x2="6" y1="6" y2="18"></line>
+<line x1="6" x2="18" y1="6" y2="18"></line>
+</svg>
+</button>
+</div>
+<!-- SHEET HEADER & PRIMARY METADATA -->
+<header class="px-8 pt-1 pb-5 shrink-0 border-b border-[#1e293b]">
+<div class="flex flex-col gap-2">
+<div class="flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center gap-2">
+<span class="font-mono text-sm font-semibold text-primary tracking-wide">INC-8492</span>
+<span class="text-slate-500 font-mono text-sm">/</span>
+<span class="text-sm font-medium text-slate-300">Houston Terminal B</span>
+</div>
+<!-- Badges & Timestamp -->
+<div class="flex items-center gap-2.5">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-red-950/70 border border-red-800/50 text-status-danger text-xs font-semibold tracking-wider uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-status-danger"></span>
+              HIGH
+            </span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-950/70 border border-amber-800/50 text-status-warning text-xs font-semibold tracking-wider uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-status-warning"></span>
+              OPEN
+            </span>
+<div class="flex items-center gap-1.5 text-slate-400 text-xs font-mono pl-1">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+<span>12 mins ago (14:32 CST)</span>
+</div>
+</div>
+</div>
+<h2 class="text-2xl font-bold text-white tracking-tight" id="sheet-incident-title">
+          Gas Leak Detected
+        </h2>
+</div>
+</header>
+<!-- SCROLLABLE BODY CONTENT AREA -->
+<div class="overflow-y-auto custom-scroll px-8 py-6 flex flex-col gap-6 bg-[#111827]">
+<!-- DESCRIPTION SECTION -->
+<section class="flex flex-col gap-2.5">
+<div class="flex items-center gap-1.5">
+<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="12" x2="12" y1="16" y2="12"></line>
+<line x1="12" x2="12.01" y1="8" y2="8"></line>
+</svg>
+<span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Description</span>
+</div>
+<div class="p-4 rounded-lg bg-[#0B0F17] border border-[#1e293b]/70">
+<p class="text-sm text-slate-200 leading-relaxed font-normal">
+            Secondary containment sensor detected organic vapor levels exceeding 45ppm in valve gallery B-12. Automated shutoff initiated; field technician dispatched for physical inspection.
+          </p>
+</div>
+</section>
+<!-- CHRONOLOGICAL ACTIVITY HISTORY (OLDEST FIRST) -->
+<section class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+</svg>
+<span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Activity History (Oldest First)</span>
+</div>
+<span class="text-xs font-mono text-slate-400">3 Events Recorded</span>
+</div>
+<!-- Strict Events List (Oldest to Newest: ONLY Action, Person/Actor, Timestamp) -->
+<div class="flex flex-col gap-1.5">
+<!-- Event 1 (Oldest) -->
+<div class="relative flex items-center justify-between p-3.5 rounded bg-[#0B0F17] border border-[#1e293b]/60">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-slate-600 rounded-l"></div>
+<div class="flex flex-col gap-0.5 pl-2">
+<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Action</span>
+<span class="text-sm font-medium text-slate-100">Incident detected</span>
+</div>
+<div class="flex items-center gap-12">
+<div class="flex flex-col gap-0.5 min-w-[130px]">
+<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Actor</span>
+<span class="text-xs font-mono font-medium text-primary">Automated System</span>
+</div>
+<div class="flex flex-col gap-0.5 text-right min-w-[70px]">
+<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Timestamp</span>
+<span class="text-xs font-mono font-semibold text-slate-200">14:32 CST</span>
+</div>
+</div>
+</div>
+<!-- Event 2 -->
+<div class="relative flex items-center justify-between p-3.5 rounded bg-[#0B0F17] border border-[#1e293b]/60">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l"></div>
+<div class="flex flex-col gap-0.5 pl-2">
+<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Action</span>
+<span class="text-sm font-medium text-slate-100">Unit 3 Dispatched</span>
+</div>
+<div class="flex items-center gap-12">
+<div class="flex flex-col gap-0.5 min-w-[130px]">
+<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Actor</span>
+<span class="text-xs font-mono font-medium text-slate-300">Marcus Vance</span>
+</div>
+<div class="flex flex-col gap-0.5 text-right min-w-[70px]">
+<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Timestamp</span>
+<span class="text-xs font-mono font-semibold text-slate-200">14:35 CST</span>
+</div>
+</div>
+</div>
+<!-- Event 3 (Latest) -->
+<div class="relative flex items-center justify-between p-3.5 rounded bg-[#0B0F17] border border-[#1e293b]/60">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-success rounded-l"></div>
+<div class="flex flex-col gap-0.5 pl-2">
+<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Action</span>
+<span class="text-sm font-medium text-slate-100">Perimeter Secured</span>
+</div>
+<div class="flex items-center gap-12">
+<div class="flex flex-col gap-0.5 min-w-[130px]">
+<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Actor</span>
+<span class="text-xs font-mono font-medium text-slate-300">Marcus Vance</span>
+</div>
+<div class="flex flex-col gap-0.5 text-right min-w-[70px]">
+<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Timestamp</span>
+<span class="text-xs font-mono font-semibold text-slate-200">14:40 CST</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- STICKY BOTTOM ACTION DOCK -->
+<footer class="p-6 bg-[#111827] border-t border-[#1e293b] shrink-0 flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-2 text-slate-400 text-xs">
+<svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<path d="M12 16v-4"></path>
+<path d="M12 8h.01"></path>
+</svg>
+<span>Acknowledging or resolving removes this incident from the attention list.</span>
+</div>
+<div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+<!-- Acknowledge Button (secondary cyan/slate) -->
+<button class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2 rounded bg-surface-elevated hover:bg-slate-700/60 border border-slate-700 text-primary text-xs font-bold uppercase tracking-wider transition-all duration-150" id="btn-ack" onclick="handleAcknowledge()" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+<polyline points="22 4 12 14.01 9 11.01"></polyline>
+</svg>
+<span>Acknowledge</span>
+</button>
+<!-- Resolve Button (primary emerald) -->
+<button class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2 rounded bg-[#10b981] hover:bg-[#059669] text-slate-950 text-xs font-bold uppercase tracking-wider transition-all duration-150 shadow-sm" id="btn-resolve" onclick="handleResolve()" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24">
+<polyline points="20 6 9 17 4 12"></polyline>
+</svg>
+<span>Resolve</span>
+</button>
+</div>
+</footer>
+</aside>
+<!-- MICRO-INTERACTIONS SCRIPT -->
+<script>
+    function closeSheet() {
+      const drawer = document.getElementById('incident-drawer');
+      const backdrop = document.getElementById('backdrop');
+      if (drawer && backdrop) {
+        drawer.style.transform = 'translate(-50%, 100%)';
+        backdrop.style.opacity = '0';
+        backdrop.style.pointerEvents = 'none';
+      }
+    }
+
+    function handleAcknowledge() {
+      const btn = document.getElementById('btn-ack');
+      if (btn) {
+        btn.innerHTML = `
+          <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span>Acknowledging...</span>
+        `;
+        btn.classList.add('pointer-events-none', 'opacity-80');
+        setTimeout(() => {
+          closeSheet();
+        }, 500);
+      }
+    }
+
+    function handleResolve() {
+      const btn = document.getElementById('btn-resolve');
+      if (btn) {
+        btn.innerHTML = `
+          <svg class="w-4 h-4 animate-spin text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span>Resolving...</span>
+        `;
+        btn.classList.add('pointer-events-none', 'opacity-80');
+        setTimeout(() => {
+          closeSheet();
+        }, 500);
+      }
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeSheet();
+      }
+    });
+  </script>
+</body></html>
