@@ -5,6 +5,9 @@ This history is a **reconstructed development walkthrough** of an existing,
 agent-assisted exercise, not a record of the original edit sequence or an
 independent/timed assessment. Commits retain their actual creation dates.
 
+See the [exercise decision notes](DECISION-JOURNAL.md) for short summaries of
+pagination, persistence, concurrency and other choices discussed during the exercise.
+
 ## Current checkpoint
 
 **6. Implement transactional status updates**
