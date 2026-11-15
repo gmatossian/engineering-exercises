@@ -1,0 +1,192 @@
+[
+  {
+    "file": "health.json",
+    "method": "GET",
+    "path": "/actuator/health",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 200,
+    "contentType": "application/vnd.spring-boot.actuator.v3+json"
+  },
+  {
+    "file": "incident-search.json",
+    "method": "GET",
+    "path": "/incidents?siteId=site-a&severity=HIGH&limit=3",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 200,
+    "contentType": "application/json"
+  },
+  {
+    "file": "incident-search-next.json",
+    "method": "GET",
+    "path": "/incidents?siteId=site-a&severity=HIGH&limit=3&cursor=MjV8MjAyNi0xMS0xMlQxODoyNjowMFo",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 200,
+    "contentType": "application/json"
+  },
+  {
+    "file": "incident-search-final.json",
+    "method": "GET",
+    "path": "/incidents?siteId=site-a&severity=HIGH&limit=3&cursor=NjF8MjAyNi0xMS0xMlQxODoyMDowMFo",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 200,
+    "contentType": "application/json"
+  },
+  {
+    "file": "incident-search-empty.json",
+    "method": "GET",
+    "path": "/incidents?cursor=MXwxOTcwLTAxLTAxVDAwOjAwOjAwWg",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 200,
+    "contentType": "application/json"
+  },
+  {
+    "file": "incident-details.json",
+    "method": "GET",
+    "path": "/incidents/28",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 200,
+    "contentType": "application/json"
+  },
+  {
+    "file": "incident-details-empty-history.json",
+    "method": "GET",
+    "path": "/incidents/4",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 200,
+    "contentType": "application/json"
+  },
+  {
+    "file": "invalid-limit.json",
+    "method": "GET",
+    "path": "/incidents?limit=101",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 400,
+    "contentType": "application/problem+json"
+  },
+  {
+    "file": "invalid-cursor.json",
+    "method": "GET",
+    "path": "/incidents?cursor=not-a-cursor",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 400,
+    "contentType": "application/problem+json"
+  },
+  {
+    "file": "invalid-severity.json",
+    "method": "GET",
+    "path": "/incidents?severity=CRITICAL",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 400,
+    "contentType": "application/problem+json"
+  },
+  {
+    "file": "invalid-id.json",
+    "method": "GET",
+    "path": "/incidents/not-a-number",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 400,
+    "contentType": "application/problem+json"
+  },
+  {
+    "file": "forbidden.json",
+    "method": "GET",
+    "path": "/incidents?siteId=site-c",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 403,
+    "contentType": "application/problem+json"
+  },
+  {
+    "file": "not-found.json",
+    "method": "GET",
+    "path": "/incidents/9999",
+    "requestBody": null,
+    "rawRequestBody": null,
+    "status": 404,
+    "contentType": "application/problem+json"
+  },
+  {
+    "file": "missing-status.json",
+    "method": "PATCH",
+    "path": "/incidents/1",
+    "requestBody": {},
+    "rawRequestBody": null,
+    "status": 400,
+    "contentType": "application/problem+json"
+  },
+  {
+    "file": "unknown-status.json",
+    "method": "PATCH",
+    "path": "/incidents/1",
+    "requestBody": {
+      "status": "UNKNOWN"
+    },
+    "rawRequestBody": null,
+    "status": 400,
+    "contentType": "application/json"
+  },
+  {
+    "file": "malformed-json.json",
+    "method": "PATCH",
+    "path": "/incidents/1",
+    "requestBody": null,
+    "rawRequestBody": "{",
+    "status": 400,
+    "contentType": "application/json"
+  },
+  {
+    "file": "incident-updated.json",
+    "method": "PATCH",
+    "path": "/incidents/1",
+    "requestBody": {
+      "status": "ACKNOWLEDGED"
+    },
+    "rawRequestBody": null,
+    "status": 200,
+    "contentType": "application/json"
+  },
+  {
+    "file": "incident-update-retry.json",
+    "method": "PATCH",
+    "path": "/incidents/1",
+    "requestBody": {
+      "status": "ACKNOWLEDGED"
+    },
+    "rawRequestBody": null,
+    "status": 200,
+    "contentType": "application/json"
+  },
+  {
+    "file": "incident-resolved.json",
+    "method": "PATCH",
+    "path": "/incidents/1",
+    "requestBody": {
+      "status": "RESOLVED"
+    },
+    "rawRequestBody": null,
+    "status": 200,
+    "contentType": "application/json"
+  },
+  {
+    "file": "conflict.json",
+    "method": "PATCH",
+    "path": "/incidents/1",
+    "requestBody": {
+      "status": "OPEN"
+    },
+    "rawRequestBody": null,
+    "status": 409,
+    "contentType": "application/problem+json"
+  }
+]

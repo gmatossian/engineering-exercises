@@ -1,0 +1,26 @@
+{
+  "id": 1,
+  "siteId": "site-a",
+  "type": "DOOR_FORCED_OPEN",
+  "severity": "LOW",
+  "status": "RESOLVED",
+  "occurredAt": "2026-11-12T18:30:00Z",
+  "description": "Practice incident 1: DOOR_FORCED_OPEN at site-a.",
+  "activityHistory": [
+    {
+      "action": "CREATED",
+      "actorId": "operator-a",
+      "occurredAt": "2026-11-12T18:30:00Z"
+    },
+    {
+      "action": "ACKNOWLEDGED",
+      "actorId": "demo-user",
+      "occurredAt": "2026-11-15T00:41:06.438754Z"
+    },
+    {
+      "action": "RESOLVED",
+      "actorId": "demo-user",
+      "occurredAt": "2026-11-15T00:41:06.445583Z"
+    }
+  ]
+}

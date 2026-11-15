@@ -1,0 +1,29 @@
+{
+  "incidents": [
+    {
+      "id": 43,
+      "siteId": "site-a",
+      "type": "ALARM_TRIGGERED",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "occurredAt": "2026-11-12T18:23:00Z"
+    },
+    {
+      "id": 52,
+      "siteId": "site-a",
+      "type": "DOOR_FORCED_OPEN",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "occurredAt": "2026-11-12T18:22:00Z"
+    },
+    {
+      "id": 61,
+      "siteId": "site-a",
+      "type": "UNAUTHORIZED_ACCESS",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "occurredAt": "2026-11-12T18:20:00Z"
+    }
+  ],
+  "nextCursor": "NjF8MjAyNi0xMS0xMlQxODoyMDowMFo"
+}

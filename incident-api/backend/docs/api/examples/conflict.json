@@ -1,0 +1,6 @@
+{
+  "detail": "Cannot change status from RESOLVED to OPEN",
+  "instance": "/incidents/1",
+  "status": 409,
+  "title": "Conflict"
+}

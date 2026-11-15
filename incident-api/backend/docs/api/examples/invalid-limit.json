@@ -1,0 +1,6 @@
+{
+  "detail": "limit must be between 1 and 100",
+  "instance": "/incidents",
+  "status": 400,
+  "title": "Bad Request"
+}

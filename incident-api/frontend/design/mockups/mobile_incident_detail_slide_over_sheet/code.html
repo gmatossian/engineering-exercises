@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="mobile_blank" name="shell-type"/>
+<title>Incident Management</title>
+<!-- Inter font from Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-base": "#0B0F17",
+            "surface-dim": "#0f131c",
+            "surface": "#0f131c",
+            "surface-raised": "#111827",
+            "surface-container-low": "#181c24",
+            "surface-container": "#1c2028",
+            "surface-container-high": "#262a33",
+            "surface-elevated": "#1E293B",
+            "surface-bright": "#353942",
+            "border-subtle": "#1F2937",
+            "border-strong": "#374151",
+            "primary": "#38bdf8",
+            "primary-light": "#8ed5ff",
+            "command-slate": "#093247",
+            "status-danger": "#EF4444",
+            "status-warning": "#F59E0B",
+            "status-success": "#10B981",
+            "on-surface": "#dfe2ee",
+            "on-surface-variant": "#94a3b8",
+            "outline": "#64748b"
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Menlo', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .font-mono, [class*="font-mono"] {
+      font-family: 'JetBrains Mono', monospace !important;
+    }
+    @layer base {
+      html, body {
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+        background-color: #0B0F17;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 16px);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-surface-base text-on-surface flex flex-col min-h-screen relative overflow-hidden select-none">
+<!-- ======================================================== -->
+<!-- 1. BACKGROUND CONTINUITY: EXACT Cleaned Mobile Incident List -->
+<!-- ======================================================== -->
+<div aria-hidden="true" class="w-full min-h-screen flex flex-col filter blur-[3px] opacity-40 pointer-events-none">
+<!-- Top Nav Header -->
+<header class="w-full pt-safe bg-surface/95 border-b border-border-subtle">
+<div class="h-14 px-4 flex items-center justify-between">
+<div>
+<h1 class="text-base font-bold text-on-surface tracking-tight leading-tight">Incident Management</h1>
+<p class="text-xs text-on-surface-variant">Active Operations &amp; Alerts</p>
+</div>
+<div class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container border border-border-subtle text-on-surface-variant">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</div>
+<!-- Filters Row -->
+<div class="px-4 py-2.5 flex items-center gap-2 border-t border-border-subtle/40 overflow-x-auto text-xs">
+<span class="px-2.5 py-1 rounded bg-primary/15 text-primary border border-primary/30 font-medium">All (8)</span>
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface-variant border border-border-subtle">High Severity</span>
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface-variant border border-border-subtle">Open</span>
+<span class="px-2.5 py-1 rounded bg-surface-container text-on-surface-variant border border-border-subtle">Acknowledged</span>
+</div>
+</header>
+<!-- Incident List Meta & Cards -->
+<div class="flex-1 px-4 py-3 flex flex-col gap-3">
+<div class="flex items-center justify-between text-xs text-on-surface-variant px-0.5">
+<span>8 incidents loaded · Newest first</span>
+<span class="font-mono text-[11px] text-primary">LIVE MONITOR</span>
+</div>
+<!-- Card 1: INC-8492 (Target Incident) -->
+<div class="bg-surface-raised border border-primary/40 rounded-xl p-3.5 shadow-lg flex flex-col gap-2 relative">
+<div class="flex items-center justify-between">
+<span class="font-mono text-xs font-semibold text-primary">INC-8492</span>
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-status-danger/20 text-status-danger border border-status-danger/30">HIGH</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-status-warning/20 text-status-warning border border-status-warning/30">OPEN</span>
+</div>
+</div>
+<div>
+<h2 class="text-sm font-semibold text-on-surface">Gas Leak Detected</h2>
+<p class="text-xs text-on-surface-variant mt-0.5">Houston Terminal B</p>
+</div>
+<div class="flex items-center justify-between text-[11px] text-outline pt-1 border-t border-border-subtle/50">
+<span>12 mins ago (14:32 CST)</span>
+<span>Valve Gallery B-12</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container border border-border-subtle rounded-xl p-3.5 flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-mono text-xs font-medium text-on-surface-variant">INC-8491</span>
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-status-warning/20 text-status-warning border border-status-warning/30">MED</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-status-warning/20 text-status-warning border border-status-warning/30">OPEN</span>
+</div>
+</div>
+<div>
+<h2 class="text-sm font-medium text-on-surface">Access Gate Overrun</h2>
+<p class="text-xs text-on-surface-variant mt-0.5">Dallas Facility • North Perimeter</p>
+</div>
+<div class="text-[11px] text-outline">35 mins ago</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container border border-border-subtle rounded-xl p-3.5 flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-mono text-xs font-medium text-on-surface-variant">INC-8490</span>
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-status-success/20 text-status-success border border-status-success/30">LOW</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-status-warning/20 text-status-warning border border-status-warning/30">OPEN</span>
+</div>
+</div>
+<div>
+<h2 class="text-sm font-medium text-on-surface">Camera Feed Intermittent</h2>
+<p class="text-xs text-on-surface-variant mt-0.5">Austin Depot • Bay 4</p>
+</div>
+<div class="text-[11px] text-outline">1h 10m ago</div>
+</div>
+</div>
+</div>
+<!-- ======================================================== -->
+<!-- DIMMED OVERLAY BACKDROP -->
+<!-- ======================================================== -->
+<div class="fixed inset-0 z-40 transition-opacity duration-300" id="modal-overlay" style="background-color: rgba(5, 8, 15, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+</div>
+<!-- ======================================================== -->
+<!-- 3. SLIDE-OVER DETAIL BOTTOM SHEET -->
+<!-- ======================================================== -->
+<aside aria-labelledby="incident-title" aria-modal="true" class="fixed inset-x-0 bottom-0 z-50 flex flex-col max-h-[85vh] h-[720px] bg-surface-raised border-t border-border-strong/70 rounded-t-2xl shadow-[0_-12px_40px_rgba(0,0,0,0.85)] overflow-hidden transition-transform duration-300 ease-out" id="incident-sheet" role="dialog">
+<!-- Top Drag Handle & Dismiss Header -->
+<div class="relative w-full pt-3 pb-2.5 px-5 flex flex-col items-center bg-surface-raised border-b border-border-subtle/50 flex-shrink-0">
+<!-- Drag handle indicator -->
+<div aria-hidden="true" class="w-10 h-1 bg-surface-bright rounded-full mb-3"></div>
+<!-- Top Bar: Incident Key + Dismiss Button -->
+<div class="w-full flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-danger opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-status-danger"></span>
+</span>
+<span class="font-mono text-xs font-semibold tracking-wider text-primary">INC-8492</span>
+</div>
+<button aria-label="Close sheet" class="w-7 h-7 flex items-center justify-center rounded-lg bg-surface-container border border-border-subtle text-on-surface-variant hover:text-on-surface hover:bg-surface-elevated transition-colors active:scale-95" id="close-sheet-btn" type="button">
+<!-- Clean Inline SVG Close Icon -->
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<line x1="18" x2="6" y1="6" y2="18"></line>
+<line x1="6" x2="18" y1="6" y2="18"></line>
+</svg>
+</button>
+</div>
+</div>
+<!-- Scrollable Middle Content -->
+<div class="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4 overscroll-contain">
+<!-- Header Section: Title, Site, Badges, Time -->
+<section class="bg-surface-elevated/70 border border-border-subtle rounded-xl p-4 flex flex-col gap-2.5">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide bg-status-danger/15 text-status-danger border border-status-danger/30 uppercase">HIGH</span>
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide bg-status-warning/15 text-status-warning border border-status-warning/30 uppercase" id="status-pill">OPEN</span>
+</div>
+<div>
+<h2 class="text-lg font-bold text-on-surface tracking-tight leading-snug" id="incident-title">Gas Leak Detected</h2>
+<p class="text-xs font-medium text-primary mt-0.5">Houston Terminal B</p>
+</div>
+<div class="flex items-center gap-1.5 pt-2 border-t border-border-subtle/50 text-xs text-on-surface-variant">
+<!-- Clock SVG -->
+<svg class="w-3.5 h-3.5 text-outline flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+<span class="tracking-tight">12 mins ago (14:32 CST)</span>
+</div>
+</section>
+<!-- Description Section -->
+<section class="flex flex-col gap-1.5">
+<h3 class="text-[11px] font-semibold uppercase tracking-wider text-outline">Description</h3>
+<div class="bg-surface-base/80 border border-border-subtle rounded-xl p-3.5">
+<p class="text-xs text-on-surface leading-relaxed font-normal">
+            Secondary containment sensor detected organic vapor levels exceeding 45ppm in valve gallery B-12. Automated shutoff initiated; field technician dispatched for physical inspection.
+          </p>
+</div>
+</section>
+<!-- Activity History Section (Oldest first) -->
+<section class="flex flex-col gap-2 pb-2">
+<div class="flex items-center justify-between">
+<h3 class="text-[11px] font-semibold uppercase tracking-wider text-outline">Activity History (Oldest First)</h3>
+<span class="font-mono text-[11px] text-outline" id="entries-count">3 entries</span>
+</div>
+<div class="flex flex-col gap-2" id="history-container">
+<!-- Entry 1 -->
+<div class="flex items-start justify-between bg-surface-base/60 border border-border-subtle rounded-lg px-3.5 py-2.5 gap-3">
+<div class="flex items-start gap-2.5 min-w-0">
+<span class="w-1.5 h-1.5 rounded-full bg-status-danger mt-1.5 flex-shrink-0"></span>
+<div class="flex flex-col min-w-0">
+<span class="text-xs font-medium text-on-surface truncate">Incident detected</span>
+<span class="text-[11px] text-on-surface-variant truncate">Automated System</span>
+</div>
+</div>
+<span class="font-mono text-[11px] text-outline whitespace-nowrap pt-0.5">14:32 CST</span>
+</div>
+<!-- Entry 2 -->
+<div class="flex items-start justify-between bg-surface-base/60 border border-border-subtle rounded-lg px-3.5 py-2.5 gap-3">
+<div class="flex items-start gap-2.5 min-w-0">
+<span class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
+<div class="flex flex-col min-w-0">
+<span class="text-xs font-medium text-on-surface truncate">Unit 3 Dispatched</span>
+<span class="text-[11px] text-on-surface-variant truncate">Marcus Vance</span>
+</div>
+</div>
+<span class="font-mono text-[11px] text-outline whitespace-nowrap pt-0.5">14:35 CST</span>
+</div>
+<!-- Entry 3 -->
+<div class="flex items-start justify-between bg-surface-base/60 border border-border-subtle rounded-lg px-3.5 py-2.5 gap-3">
+<div class="flex items-start gap-2.5 min-w-0">
+<span class="w-1.5 h-1.5 rounded-full bg-status-success mt-1.5 flex-shrink-0"></span>
+<div class="flex flex-col min-w-0">
+<span class="text-xs font-medium text-on-surface truncate">Perimeter Secured</span>
+<span class="text-[11px] text-on-surface-variant truncate">Marcus Vance</span>
+</div>
+</div>
+<span class="font-mono text-[11px] text-outline whitespace-nowrap pt-0.5">14:40 CST</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Sticky Bottom Action Bar -->
+<footer class="w-full bg-surface/95 backdrop-blur-md border-t border-border-strong/60 px-5 py-3.5 pb-safe flex-shrink-0 flex items-center gap-3">
+<!-- Acknowledge Button (Outline / Cyan) -->
+<button class="flex-1 h-11 px-3 rounded-lg border border-primary/40 bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-2 focus:outline-none" id="btn-acknowledge" type="button">
+<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+<path d="m9 12 2 2 4-4"></path>
+</svg>
+<span>Acknowledge</span>
+</button>
+<!-- Resolve Button (Emerald Green) -->
+<button class="flex-1 h-11 px-3 rounded-lg bg-status-success hover:bg-status-success/90 text-surface-base font-semibold text-xs shadow-[0_2px_10px_rgba(16,185,129,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-2 focus:outline-none" id="btn-resolve" type="button">
+<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<path d="m9 12 2 2 4-4"></path>
+</svg>
+<span>Resolve</span>
+</button>
+</footer>
+</aside>
+<!-- Interactive Logic -->
+<script>
+    (function initIncidentActions() {
+      const sheet = document.getElementById('incident-sheet');
+      const overlay = document.getElementById('modal-overlay');
+      const closeBtn = document.getElementById('close-sheet-btn');
+      const btnAck = document.getElementById('btn-acknowledge');
+      const btnResolve = document.getElementById('btn-resolve');
+      const statusPill = document.getElementById('status-pill');
+      const historyContainer = document.getElementById('history-container');
+      const entriesCount = document.getElementById('entries-count');
+
+      let entryCount = 3;
+
+      function closeSheet() {
+        if (!sheet || !overlay) return;
+        sheet.style.transform = 'translateY(100%)';
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+        setTimeout(() => {
+          sheet.style.display = 'none';
+          overlay.style.display = 'none';
+        }, 300);
+      }
+
+      closeBtn?.addEventListener('click', closeSheet);
+      overlay?.addEventListener('click', closeSheet);
+
+      function addActivity(action, actor) {
+        if (!historyContainer) return;
+        entryCount++;
+        if (entriesCount) entriesCount.textContent = `${entryCount} entries`;
+
+        const now = new Date();
+        const hrs = String(now.getHours()).padStart(2, '0');
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        const timeStr = `${hrs}:${mins} CST`;
+
+        const item = document.createElement('div');
+        item.className = 'flex items-start justify-between bg-surface-base/60 border border-border-subtle rounded-lg px-3.5 py-2.5 gap-3 transition-opacity duration-300';
+        item.innerHTML = `
+          <div class="flex items-start gap-2.5 min-w-0">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-medium text-on-surface truncate">${action}</span>
+              <span class="text-[11px] text-on-surface-variant truncate">${actor}</span>
+            </div>
+          </div>
+          <span class="font-mono text-[11px] text-outline whitespace-nowrap pt-0.5">${timeStr}</span>
+        `;
+        historyContainer.appendChild(item);
+      }
+
+      btnAck?.addEventListener('click', () => {
+        if (!statusPill) return;
+        statusPill.textContent = 'ACKNOWLEDGED';
+        statusPill.className = 'px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide bg-primary/20 text-primary border border-primary/30 uppercase';
+        btnAck.disabled = true;
+        btnAck.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+        addActivity('Incident Acknowledged', 'Operator Current');
+      });
+
+      btnResolve?.addEventListener('click', () => {
+        if (!statusPill) return;
+        statusPill.textContent = 'RESOLVED';
+        statusPill.className = 'px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide bg-status-success/20 text-status-success border border-status-success/30 uppercase';
+        btnResolve.disabled = true;
+        btnResolve.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+        if (btnAck) {
+          btnAck.disabled = true;
+          btnAck.classList.add('opacity-40', 'cursor-not-allowed', 'pointer-events-none');
+        }
+        addActivity('Incident Resolved', 'Operator Current');
+      });
+    })();
+  </script>
+</body></html>

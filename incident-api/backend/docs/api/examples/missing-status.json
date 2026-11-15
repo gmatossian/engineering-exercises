@@ -1,0 +1,6 @@
+{
+  "detail": "status is required",
+  "instance": "/incidents/1",
+  "status": 400,
+  "title": "Bad Request"
+}

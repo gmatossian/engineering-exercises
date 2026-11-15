@@ -1,0 +1,6 @@
+{
+  "detail": "Invalid value for parameter 'severity'",
+  "instance": "/incidents",
+  "status": 400,
+  "title": "Bad Request"
+}

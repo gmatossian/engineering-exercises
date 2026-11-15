@@ -1,0 +1,21 @@
+{
+  "id": 28,
+  "siteId": "site-a",
+  "type": "DOOR_FORCED_OPEN",
+  "severity": "LOW",
+  "status": "ACKNOWLEDGED",
+  "occurredAt": "2026-11-12T18:26:00Z",
+  "description": "Practice incident 28: DOOR_FORCED_OPEN at site-a.",
+  "activityHistory": [
+    {
+      "action": "CREATED",
+      "actorId": "operator-a",
+      "occurredAt": "2026-11-12T18:26:00Z"
+    },
+    {
+      "action": "ACKNOWLEDGED",
+      "actorId": "operator-a",
+      "occurredAt": "2026-11-12T18:26:10Z"
+    }
+  ]
+}

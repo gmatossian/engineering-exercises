@@ -1,0 +1,21 @@
+{
+  "incidents": [
+    {
+      "id": 79,
+      "siteId": "site-a",
+      "type": "CAMERA_OFFLINE",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "occurredAt": "2026-11-12T18:17:00Z"
+    },
+    {
+      "id": 88,
+      "siteId": "site-a",
+      "type": "UNAUTHORIZED_ACCESS",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "occurredAt": "2026-11-12T18:16:00Z"
+    }
+  ],
+  "nextCursor": null
+}

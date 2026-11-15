@@ -36,6 +36,13 @@ directories. No UI, frontend framework, dependencies or build setup is present.
 The six historical checkpoints below predate this directory split; their
 snapshot links retain the original layout.
 
+## Frontend integration contract
+
+The [API contract package](backend/docs/api/README.md) provides an OpenAPI
+specification, captured request/response examples and UI integration rules for
+all three incident operations. Start there when implementing a consumer; the
+frontend mockups are visual references rather than API definitions.
+
 ## Run
 
 Prerequisite: a JDK 21 installation selected in `JAVA_HOME` (verified with
