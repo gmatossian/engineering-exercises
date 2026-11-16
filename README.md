@@ -9,6 +9,7 @@ may represent different attempts, constraints or approaches.
 | Project | Description | Tags |
 | --- | --- | --- |
 | [Incident API](incident-api/) | Incremental incident-management API exercise: scaffold through search, details and status updates | `java`, `spring-boot`, `rest-api`, `cursor-pagination`, `jdbc-client`, `h2`, `transactions` |
+| [Predefined-slot booking](predefined-slot-booking/) | Runnable JPA/H2 skeleton with endpoint exercise placeholders | `java`, `spring-boot`, `spring-data-jpa`, `h2`, `booking`, `idempotency`, `optimistic-concurrency` |
 
 Each project is independently runnable. Its README explains the requirements,
 available features, run instructions, limitations and development checkpoints.
