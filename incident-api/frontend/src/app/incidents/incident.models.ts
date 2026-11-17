@@ -2,6 +2,17 @@ export type IncidentSeverity = 'LOW' | 'MEDIUM' | 'HIGH';
 
 export type IncidentStatus = 'OPEN';
 
+export type IncidentSiteId = 'site-a' | 'site-b';
+
+export type SiteFilter = 'all' | IncidentSiteId;
+
+export type SeverityFilter = 'all' | IncidentSeverity;
+
+export interface IncidentFilters {
+  site: SiteFilter;
+  severity: SeverityFilter;
+}
+
 export interface IncidentSummary {
   id: number;
   siteId: string;

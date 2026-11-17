@@ -12,6 +12,31 @@
     }
   </div>
 
+  <div class="filter-bar" role="group" aria-label="Incident filters">
+    <label class="filter-field">
+      <span class="field-label">Site</span>
+      <select #siteSelect [value]="filters().site" (change)="selectSite(siteSelect.value)">
+        @for (option of siteOptions; track option.value) {
+          <option [value]="option.value" [selected]="option.value === filters().site">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span class="field-label">Severity</span>
+      <select #severitySelect [value]="filters().severity" (change)="selectSeverity(severitySelect.value)">
+        @for (option of severityOptions; track option.value) {
+          <option [value]="option.value" [selected]="option.value === filters().severity">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="filter-actions">
+      <button type="button" class="secondary" (click)="clearFilters()">Clear</button>
+      <button type="button" class="secondary" (click)="refresh()">Refresh</button>
+    </div>
+  </div>
+
   @if (state(); as currentState) {
     @switch (currentState.kind) {
       @case ('loading') {
@@ -23,7 +48,11 @@
       @case ('empty') {
         <div class="state-panel" role="status">
           <p class="state-title">No open incidents were found.</p>
-          <p>The first page loaded successfully, but no incidents require attention.</p>
+          @if (hasActiveFilters()) {
+            <p>No open incidents match the selected filters.</p>
+          } @else {
+            <p>The first page loaded successfully, but no incidents require attention.</p>
+          }
         </div>
       }
       @case ('error') {

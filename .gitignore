@@ -1,4 +1,5 @@
 /.execdesk/
+/incident-api/.nextdesk/
 /incident-api/.idea/
 
 /predefined-slot-booking/.idea/
