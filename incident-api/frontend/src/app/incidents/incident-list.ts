@@ -3,17 +3,27 @@ import {
   Component,
   computed,
   DestroyRef,
+  ElementRef,
   inject,
   OnInit,
   signal,
+  viewChild,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 import {
   formatSiteLabel,
   formatZonedTime,
+  normalizeIncidentDetailError,
   normalizeIncidentListError,
 } from "./incident-formatters";
+import { IncidentDetailSheet } from "./incident-detail-sheet";
+import {
+  IncidentDetailEvent,
+  IncidentDetailRequest,
+  initialIncidentDetailState,
+  reduceIncidentDetail,
+} from "./incident-detail.machine";
 import {
   IncidentListEvent,
   IncidentListRequest,
@@ -34,6 +44,7 @@ const SEVERITY_FILTERS: readonly SeverityFilter[] = [
 
 @Component({
   selector: "app-incident-list",
+  imports: [IncidentDetailSheet],
   templateUrl: "./incident-list.html",
   styleUrl: "./incident-list.css",
 })
@@ -42,8 +53,14 @@ export class IncidentList implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   private nextToken = 0;
+  private nextDetailToken = 0;
+  private detailOrigin: HTMLElement | null = null;
+
+  private readonly listHeading =
+    viewChild.required<ElementRef<HTMLElement>>("listHeading");
 
   readonly state = signal(initialIncidentListState());
+  readonly detailState = signal(initialIncidentDetailState());
   readonly filters = computed(() => this.state().filters);
   readonly hasActiveFilters = computed(
     () => this.filters().site !== "all" || this.filters().severity !== "all",
@@ -100,6 +117,32 @@ export class IncidentList implements OnInit {
     this.startAppend();
   }
 
+  selectIncident(incidentId: number, origin: EventTarget | null): void {
+    this.detailOrigin = origin instanceof HTMLElement ? origin : null;
+    const token = ++this.nextDetailToken;
+    this.dispatchDetail({ type: "selected", incidentId, token });
+    const request = this.acceptedDetailRequest(token);
+    if (request) {
+      this.runDetailRequest(request);
+    }
+  }
+
+  retryDetail(): void {
+    const token = ++this.nextDetailToken;
+    this.dispatchDetail({ type: "retryRequested", token });
+    const request = this.acceptedDetailRequest(token);
+    if (request) {
+      this.runDetailRequest(request);
+    }
+  }
+
+  closeDetail(): void {
+    const origin = this.detailOrigin;
+    this.detailOrigin = null;
+    this.dispatchDetail({ type: "closed" });
+    queueMicrotask(() => this.restoreDetailFocus(origin));
+  }
+
   private replace(reason: ReplacementReason, filters: IncidentFilters): void {
     const token = ++this.nextToken;
     this.dispatch({ type: "replacementRequested", token, reason, filters });
@@ -154,7 +197,48 @@ export class IncidentList implements OnInit {
       });
   }
 
+  private acceptedDetailRequest(token: number): IncidentDetailRequest | null {
+    const request = this.detailState().activeRequest;
+    return request?.token === token ? request : null;
+  }
+
+  private runDetailRequest(request: IncidentDetailRequest): void {
+    this.api
+      .getById(request.incidentId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (detail) =>
+          this.dispatchDetail({ type: "requestSucceeded", request, detail }),
+        error: (error: unknown) => {
+          const status = error instanceof HttpErrorResponse ? error.status : 0;
+          const body =
+            error instanceof HttpErrorResponse ? error.error : undefined;
+          this.dispatchDetail({
+            type: "requestFailed",
+            request,
+            status,
+            message: normalizeIncidentDetailError(body),
+          });
+        },
+      });
+  }
+
+  private restoreDetailFocus(origin: HTMLElement | null): void {
+    if (origin?.isConnected) {
+      origin.focus();
+      return;
+    }
+    const firstCurrentControl = document.querySelector<HTMLElement>(
+      ".incident-list .incident-select",
+    );
+    (firstCurrentControl ?? this.listHeading().nativeElement).focus();
+  }
+
   private dispatch(event: IncidentListEvent): void {
     this.state.update((state) => reduceIncidentList(state, event));
+  }
+
+  private dispatchDetail(event: IncidentDetailEvent): void {
+    this.detailState.update((state) => reduceIncidentDetail(state, event));
   }
 }

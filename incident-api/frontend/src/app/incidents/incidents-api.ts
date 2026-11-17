@@ -2,7 +2,11 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 
-import { IncidentFilters, IncidentSearchResponse } from "./incident.models";
+import {
+  IncidentDetail,
+  IncidentFilters,
+  IncidentSearchResponse,
+} from "./incident.models";
 
 @Injectable({ providedIn: "root" })
 export class IncidentsApi {
@@ -25,5 +29,9 @@ export class IncidentsApi {
     }
 
     return this.http.get<IncidentSearchResponse>("/incidents", { params });
+  }
+
+  getById(id: number): Observable<IncidentDetail> {
+    return this.http.get<IncidentDetail>(`/incidents/${id}`);
   }
 }

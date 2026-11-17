@@ -1,0 +1,236 @@
+:host {
+  inset: 0;
+  position: fixed;
+  z-index: 100;
+}
+
+.detail-backdrop {
+  background: rgb(2 8 23 / 72%);
+  inset: 0;
+  position: absolute;
+}
+
+.detail-sheet {
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: -1.5rem 0 4rem rgb(0 0 0 / 35%);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-left: auto;
+  max-width: 100%;
+  position: relative;
+  width: min(32rem, 92vw);
+}
+
+.detail-header {
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: space-between;
+  padding: 1rem 1.2rem;
+}
+
+.eyebrow,
+h2,
+h3,
+p,
+dl,
+dd {
+  margin: 0;
+}
+
+.eyebrow,
+dt {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+h2 {
+  color: var(--text-strong);
+  font-size: 1.35rem;
+}
+
+h3 {
+  color: var(--text-strong);
+  font-size: 0.95rem;
+}
+
+button {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 0.45rem;
+  color: #03131d;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 0.55rem 0.9rem;
+}
+
+button:focus-visible,
+.detail-sheet:focus-visible {
+  outline: 3px solid rgb(125 211 252 / 55%);
+  outline-offset: 3px;
+}
+
+.icon-button {
+  align-items: center;
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-strong);
+  display: inline-flex;
+  font-size: 1.5rem;
+  height: 2.5rem;
+  justify-content: center;
+  padding: 0;
+  width: 2.5rem;
+}
+
+.detail-body:focus-visible {
+  outline: 3px solid rgb(125 211 252 / 55%);
+  outline-offset: -3px;
+}
+
+.detail-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding: 1.2rem;
+}
+
+.detail-state {
+  align-items: center;
+  color: var(--text-secondary);
+  display: flex;
+  gap: 0.8rem;
+  min-height: 10rem;
+}
+
+.detail-state p,
+.detail-section p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 0.4rem;
+}
+
+.state-marker {
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.35rem rgb(56 189 248 / 12%);
+  height: 0.6rem;
+  width: 0.6rem;
+}
+
+.error-state {
+  align-items: flex-start;
+  background: var(--surface-raised);
+  border: 1px solid rgb(251 113 133 / 35%);
+  border-radius: 0.65rem;
+  flex-direction: column;
+  min-height: auto;
+  padding: 1rem;
+}
+
+.detail-summary {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.detail-summary > div {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  min-width: 0;
+  padding: 0.7rem;
+}
+
+.detail-summary .wide {
+  grid-column: 1 / -1;
+}
+
+dd {
+  color: var(--text-strong);
+  font-size: 0.88rem;
+  font-weight: 650;
+  margin-top: 0.25rem;
+  overflow-wrap: anywhere;
+}
+
+.detail-section {
+  border-top: 1px solid var(--border);
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+}
+
+.empty-history {
+  background: var(--surface-raised);
+  border: 1px dashed var(--border);
+  border-radius: 0.55rem;
+  padding: 0.8rem;
+}
+
+.activity-list {
+  display: grid;
+  gap: 0.7rem;
+  list-style: none;
+  margin: 0.8rem 0 0;
+  padding: 0;
+}
+
+.activity-item {
+  border-left: 0.2rem solid var(--accent);
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.35rem 0.7rem;
+}
+
+.activity-action {
+  color: var(--text-strong);
+}
+
+.activity-item span,
+time {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 48rem) {
+  :host {
+    align-items: end;
+    display: flex;
+  }
+
+  .detail-sheet {
+    border-left: 0;
+    border-radius: 1rem 1rem 0 0;
+    border-top: 1px solid var(--border);
+    height: min(90dvh, 48rem);
+    margin: auto 0 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 28rem) {
+  .detail-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-summary .wide {
+    grid-column: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,117 @@
+<div class="detail-backdrop" aria-hidden="true"></div>
+<section
+  #dialog
+  class="detail-sheet"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="incident-detail-heading"
+  tabindex="-1"
+>
+  <header class="detail-header">
+    <div>
+      <p class="eyebrow">Incident detail</p>
+      <h2 id="incident-detail-heading">
+        @if (state().selectedId; as id) { Incident {{ id }} } @else { Incident }
+      </h2>
+    </div>
+    <button
+      #closeButton
+      type="button"
+      class="icon-button"
+      aria-label="Close incident details"
+      (click)="close.emit()"
+    >
+      <span aria-hidden="true">×</span>
+    </button>
+  </header>
+
+  <div
+    class="detail-body"
+    tabindex="0"
+    role="region"
+    aria-label="Incident detail content"
+  >
+    @switch (state().phase) { @case ('loading') {
+    <div class="detail-state" role="status" aria-live="polite">
+      <span class="state-marker" aria-hidden="true"></span>
+      <div>
+        <h3>Loading incident</h3>
+        <p>Loading incident {{ state().selectedId }}…</p>
+      </div>
+    </div>
+    } @case ('accessDenied') {
+    <div class="detail-state error-state" role="alert">
+      <h3>Access denied</h3>
+      <p>{{ state().errorMessage }}</p>
+    </div>
+    } @case ('notFound') {
+    <div class="detail-state error-state" role="alert">
+      <h3>Incident not found</h3>
+      <p>{{ state().errorMessage }}</p>
+    </div>
+    } @case ('error') {
+    <div class="detail-state error-state" role="alert">
+      <h3>Unable to load incident</h3>
+      <p>{{ state().errorMessage }}</p>
+      <button type="button" (click)="retry.emit()">Retry</button>
+    </div>
+    } @case ('ready') { @if (state().detail; as detail) {
+    <dl class="detail-summary">
+      <div>
+        <dt>ID</dt>
+        <dd>{{ detail.id }}</dd>
+      </div>
+      <div>
+        <dt>Site</dt>
+        <dd>{{ formatSiteLabel(detail.siteId) }}</dd>
+      </div>
+      <div>
+        <dt>Type</dt>
+        <dd>{{ detail.type }}</dd>
+      </div>
+      <div>
+        <dt>Severity</dt>
+        <dd>{{ detail.severity }}</dd>
+      </div>
+      <div>
+        <dt>Status</dt>
+        <dd>{{ detail.status }}</dd>
+      </div>
+      <div class="wide">
+        <dt>Occurred</dt>
+        <dd>
+          <time [attr.datetime]="detail.occurredAt"
+            >{{ formatZonedTime(detail.occurredAt) }}</time
+          >
+        </dd>
+      </div>
+    </dl>
+
+    <section class="detail-section" aria-labelledby="description-heading">
+      <h3 id="description-heading">Description</h3>
+      <p>{{ detail.description }}</p>
+    </section>
+
+    <section class="detail-section" aria-labelledby="history-heading">
+      <h3 id="history-heading">Activity history</h3>
+      @if (detail.activityHistory.length === 0) {
+      <p class="empty-history">
+        No activity has been recorded for this incident.
+      </p>
+      } @else {
+      <ol class="activity-list">
+        @for (activity of detail.activityHistory; track $index) {
+        <li class="activity-item">
+          <strong class="activity-action">{{ activity.action }}</strong>
+          <span>Actor ID: {{ activity.actorId }}</span>
+          <time [attr.datetime]="activity.occurredAt"
+            >{{ formatZonedTime(activity.occurredAt) }}</time
+          >
+        </li>
+        }
+      </ol>
+      }
+    </section>
+    } } }
+  </div>
+</section>

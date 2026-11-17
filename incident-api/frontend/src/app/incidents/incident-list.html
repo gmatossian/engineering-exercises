@@ -2,7 +2,9 @@
   <div class="section-heading">
     <div>
       <p class="eyebrow">Live operations</p>
-      <h2 id="incident-list-heading">Incidents requiring attention</h2>
+      <h2 #listHeading id="incident-list-heading" tabindex="-1">
+        Incidents requiring attention
+      </h2>
     </div>
 
     @if (loadedCount() > 0) {
@@ -88,36 +90,44 @@
   <ul class="incident-collection">
     @for (incident of currentState.items; track incident.id) {
     <li>
-      <article class="incident-row" [attr.data-severity]="incident.severity">
-        <div class="incident-identity">
-          <span class="incident-id"
-            ><span class="field-label">ID</span> {{ incident.id }}</span
-          >
-          <span class="site-label"
-            ><span class="field-label">Site</span> {{
-            formatSiteLabel(incident.siteId) }}</span
-          >
-        </div>
+      <button
+        type="button"
+        class="incident-select"
+        [attr.aria-label]="'View incident ' + incident.id + ' details'"
+        (click)="selectIncident(incident.id, $event.currentTarget)"
+      >
+        <article class="incident-row" [attr.data-severity]="incident.severity">
+          <div class="incident-identity">
+            <span class="incident-id"
+              ><span class="field-label">ID</span> {{ incident.id }}</span
+            >
+            <span class="site-label"
+              ><span class="field-label">Site</span> {{
+              formatSiteLabel(incident.siteId) }}</span
+            >
+          </div>
 
-        <p class="incident-type">
-          <span class="field-label">Type</span> {{ incident.type }}
-        </p>
+          <p class="incident-type">
+            <span class="field-label">Type</span> {{ incident.type }}
+          </p>
 
-        <div class="incident-badges">
-          <span class="badge severity"
-            ><span class="field-label">Severity</span> {{ incident.severity
-            }}</span
-          >
-          <span class="badge status"
-            ><span class="field-label">Status</span> {{ incident.status }}</span
-          >
-        </div>
+          <div class="incident-badges">
+            <span class="badge severity"
+              ><span class="field-label">Severity</span> {{ incident.severity
+              }}</span
+            >
+            <span class="badge status"
+              ><span class="field-label">Status</span> {{ incident.status
+              }}</span
+            >
+          </div>
 
-        <time [attr.datetime]="incident.occurredAt">
-          <span class="field-label">Occurred</span>
-          {{ formatZonedTime(incident.occurredAt) }}
-        </time>
-      </article>
+          <time [attr.datetime]="incident.occurredAt">
+            <span class="field-label">Occurred</span>
+            {{ formatZonedTime(incident.occurredAt) }}
+          </time>
+        </article>
+      </button>
     </li>
     }
   </ul>
@@ -142,5 +152,11 @@
     </p>
     } }
   </div>
-  } }
+  } } @if (detailState().phase !== 'closed') {
+  <app-incident-detail-sheet
+    [state]="detailState()"
+    (retry)="retryDetail()"
+    (close)="closeDetail()"
+  />
+  }
 </section>
