@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 
+import { IncidentList } from './incidents/incident-list';
+
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [IncidentList],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
