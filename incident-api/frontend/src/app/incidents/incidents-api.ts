@@ -1,23 +1,29 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { inject, Injectable } from "@angular/core";
+import { Observable } from "rxjs";
 
-import { IncidentFilters, IncidentSearchResponse } from './incident.models';
+import { IncidentFilters, IncidentSearchResponse } from "./incident.models";
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class IncidentsApi {
   private readonly http = inject(HttpClient);
 
-  /** Fetches a cursor-free first page; an "all" filter is sent by omitting its parameter. */
-  getFirstPage(filters: IncidentFilters = { site: 'all', severity: 'all' }): Observable<IncidentSearchResponse> {
+  /** Searches with an optional opaque cursor; "all" filters and only a null cursor are omitted. */
+  search(
+    filters: IncidentFilters,
+    cursor: string | null,
+  ): Observable<IncidentSearchResponse> {
     let params = new HttpParams();
-    if (filters.site !== 'all') {
-      params = params.set('siteId', filters.site);
+    if (filters.site !== "all") {
+      params = params.set("siteId", filters.site);
     }
-    if (filters.severity !== 'all') {
-      params = params.set('severity', filters.severity);
+    if (filters.severity !== "all") {
+      params = params.set("severity", filters.severity);
+    }
+    if (cursor !== null) {
+      params = params.set("cursor", cursor);
     }
 
-    return this.http.get<IncidentSearchResponse>('/incidents', { params });
+    return this.http.get<IncidentSearchResponse>("/incidents", { params });
   }
 }

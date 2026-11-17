@@ -5,91 +5,142 @@
       <h2 id="incident-list-heading">Incidents requiring attention</h2>
     </div>
 
-    @if (state(); as currentState) {
-      @if (currentState.kind === 'ready') {
-        <p class="loaded-count" role="status">{{ currentState.items.length }} incidents loaded</p>
-      }
+    @if (loadedCount() > 0) {
+    <p class="loaded-count" role="status">
+      {{ loadedCount() }} incidents loaded
+    </p>
     }
   </div>
 
   <div class="filter-bar" role="group" aria-label="Incident filters">
     <label class="filter-field">
       <span class="field-label">Site</span>
-      <select #siteSelect [value]="filters().site" (change)="selectSite(siteSelect.value)">
+      <select
+        #siteSelect
+        [value]="filters().site"
+        (change)="selectSite(siteSelect.value)"
+      >
         @for (option of siteOptions; track option.value) {
-          <option [value]="option.value" [selected]="option.value === filters().site">{{ option.label }}</option>
+        <option
+          [value]="option.value"
+          [selected]="option.value === filters().site"
+        >
+          {{ option.label }}
+        </option>
         }
       </select>
     </label>
 
     <label class="filter-field">
       <span class="field-label">Severity</span>
-      <select #severitySelect [value]="filters().severity" (change)="selectSeverity(severitySelect.value)">
+      <select
+        #severitySelect
+        [value]="filters().severity"
+        (change)="selectSeverity(severitySelect.value)"
+      >
         @for (option of severityOptions; track option.value) {
-          <option [value]="option.value" [selected]="option.value === filters().severity">{{ option.label }}</option>
+        <option
+          [value]="option.value"
+          [selected]="option.value === filters().severity"
+        >
+          {{ option.label }}
+        </option>
         }
       </select>
     </label>
 
     <div class="filter-actions">
-      <button type="button" class="secondary" (click)="clearFilters()">Clear</button>
-      <button type="button" class="secondary" (click)="refresh()">Refresh</button>
+      <button type="button" class="secondary" (click)="clearFilters()">
+        Clear
+      </button>
+      <button type="button" class="secondary" (click)="refresh()">
+        Refresh
+      </button>
     </div>
   </div>
 
-  @if (state(); as currentState) {
-    @switch (currentState.kind) {
-      @case ('loading') {
-        <div class="state-panel" role="status">
-          <span class="state-marker" aria-hidden="true"></span>
-          <p>Loading incidents…</p>
-        </div>
-      }
-      @case ('empty') {
-        <div class="state-panel" role="status">
-          <p class="state-title">No open incidents were found.</p>
-          @if (hasActiveFilters()) {
-            <p>No open incidents match the selected filters.</p>
-          } @else {
-            <p>The first page loaded successfully, but no incidents require attention.</p>
-          }
-        </div>
-      }
-      @case ('error') {
-        <div class="state-panel error-panel" role="alert">
-          <div>
-            <p class="state-title">Unable to load incidents</p>
-            <p>{{ currentState.message }}</p>
-          </div>
-          <button type="button" (click)="retry()">Retry</button>
-        </div>
-      }
-      @case ('ready') {
-        <ul class="incident-collection">
-          @for (incident of currentState.items; track incident.id) {
-            <li>
-              <article class="incident-row" [attr.data-severity]="incident.severity">
-                <div class="incident-identity">
-                  <span class="incident-id"><span class="field-label">ID</span> {{ incident.id }}</span>
-                  <span class="site-label"><span class="field-label">Site</span> {{ formatSiteLabel(incident.siteId) }}</span>
-                </div>
-
-                <p class="incident-type"><span class="field-label">Type</span> {{ incident.type }}</p>
-
-                <div class="incident-badges">
-                  <span class="badge severity"><span class="field-label">Severity</span> {{ incident.severity }}</span>
-                  <span class="badge status"><span class="field-label">Status</span> {{ incident.status }}</span>
-                </div>
-
-                <time [attr.datetime]="incident.occurredAt">
-                  <span class="field-label">Occurred</span>
-                  {{ formatZonedTime(incident.occurredAt) }}
-                </time>
-              </article>
-            </li>
-          }
-        </ul>
-      }
+  @if (state(); as currentState) { @switch (currentState.phase) { @case
+  ('replacing') {
+  <div class="state-panel" role="status">
+    <span class="state-marker" aria-hidden="true"></span>
+    <p>Loading incidents…</p>
+  </div>
+  } @case ('empty') {
+  <div class="state-panel" role="status">
+    <p class="state-title">No open incidents were found.</p>
+    @if (hasActiveFilters()) {
+    <p>No open incidents match the selected filters.</p>
+    } @else {
+    <p>
+      The first page loaded successfully, but no incidents require attention.
+    </p>
     }
-  }
+  </div>
+  } @case ('replacementError') {
+  <div class="state-panel error-panel" role="alert">
+    <div>
+      <p class="state-title">Unable to load incidents</p>
+      <p>{{ currentState.errorMessage }}</p>
+    </div>
+    <button type="button" (click)="retry()">Retry</button>
+  </div>
+  } } @if (currentState.items.length > 0) {
+  <ul class="incident-collection">
+    @for (incident of currentState.items; track incident.id) {
+    <li>
+      <article class="incident-row" [attr.data-severity]="incident.severity">
+        <div class="incident-identity">
+          <span class="incident-id"
+            ><span class="field-label">ID</span> {{ incident.id }}</span
+          >
+          <span class="site-label"
+            ><span class="field-label">Site</span> {{
+            formatSiteLabel(incident.siteId) }}</span
+          >
+        </div>
+
+        <p class="incident-type">
+          <span class="field-label">Type</span> {{ incident.type }}
+        </p>
+
+        <div class="incident-badges">
+          <span class="badge severity"
+            ><span class="field-label">Severity</span> {{ incident.severity
+            }}</span
+          >
+          <span class="badge status"
+            ><span class="field-label">Status</span> {{ incident.status }}</span
+          >
+        </div>
+
+        <time [attr.datetime]="incident.occurredAt">
+          <span class="field-label">Occurred</span>
+          {{ formatZonedTime(incident.occurredAt) }}
+        </time>
+      </article>
+    </li>
+    }
+  </ul>
+
+  <div class="pagination-footer">
+    @switch (currentState.phase) { @case ('ready') {
+    <button type="button" (click)="loadMore()">Load more</button>
+    } @case ('appending') {
+    <p class="pagination-status" role="status">Loading more incidents…</p>
+    <button type="button" disabled>Load more</button>
+    } @case ('appendError') {
+    <div class="pagination-error" role="alert">
+      <p>
+        <strong>Unable to load more incidents.</strong> {{
+        currentState.errorMessage }}
+      </p>
+      <button type="button" (click)="retryAppend()">Retry loading more</button>
+    </div>
+    } @case ('complete') {
+    <p class="pagination-status completion-status" role="status">
+      End of incidents reached
+    </p>
+    } }
+  </div>
+  } }
 </section>
