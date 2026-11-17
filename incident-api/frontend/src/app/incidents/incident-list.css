@@ -169,6 +169,37 @@ button.secondary:hover {
   padding: 0;
 }
 
+.incident-select {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  display: block;
+  padding: 0;
+  text-align: inherit;
+  width: 100%;
+}
+
+.incident-select:hover {
+  background: transparent;
+}
+
+.incident-select:hover .incident-row {
+  background: var(--surface-raised);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
+.incident-select:focus-visible {
+  border-radius: 0.55rem;
+  outline: 3px solid rgb(125 211 252 / 45%);
+  outline-offset: 3px;
+}
+
+#incident-list-heading:focus-visible {
+  border-radius: 0.25rem;
+  outline: 3px solid rgb(125 211 252 / 45%);
+  outline-offset: 3px;
+}
+
 .pagination-footer {
   align-items: center;
   display: flex;
